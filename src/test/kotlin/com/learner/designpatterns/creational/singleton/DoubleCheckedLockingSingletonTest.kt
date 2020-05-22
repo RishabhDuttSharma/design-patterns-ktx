@@ -9,6 +9,7 @@ internal class DoubleCheckedLockingSingletonTest {
     @Test
     fun test_getInstance() {
         val instance = DoubleCheckedLockingSingleton.getInstance()
+        Assert.assertNotNull(instance)
         Assert.assertEquals(instance, DoubleCheckedLockingSingleton.getInstance())
     }
 }
