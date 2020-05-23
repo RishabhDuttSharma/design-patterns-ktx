@@ -21,13 +21,17 @@ import org.junit.Test
 
 
 /**
+ * Test Cases for [DoubleCheckedLockingSingleton]
  *
  * Created by Rishabh on 21-05-2020
  */
 internal class DoubleCheckedLockingSingletonTest {
 
+    /**
+     * Verifies that getInstance() method always returns same instance
+     */
     @Test
-    fun test_getInstance() {
+    fun test_getInstance_alwaysReturnsSameInstance() {
         val instance = DoubleCheckedLockingSingleton.getInstance()
         Assert.assertNotNull(instance)
         Assert.assertEquals(instance, DoubleCheckedLockingSingleton.getInstance())

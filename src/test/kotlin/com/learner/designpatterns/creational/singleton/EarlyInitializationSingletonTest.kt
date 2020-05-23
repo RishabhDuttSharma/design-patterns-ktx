@@ -21,19 +21,24 @@ import org.junit.Test
 
 
 /**
+ * Test Cases for [EarlyInitializationSingleton]
  *
  * Created by Rishabh on 21-05-2020
  */
 internal class EarlyInitializationSingletonTest {
 
+    private lateinit var mInstance: EarlyInitializationSingleton
+
     /**
      * Verifies that getInstance() method always returns same instance
      */
     @Test
-    fun test_getInstance_returnsSameInstanceEveryTime() {
+    fun test_getInstance_alwaysReturnsSameInstance() {
         val instance = EarlyInitializationSingleton.getInstance()
         Assert.assertNotNull(instance)
         Assert.assertEquals(instance, EarlyInitializationSingleton.getInstance())
+
+        mInstance = instance
     }
 
     /**
@@ -41,6 +46,7 @@ internal class EarlyInitializationSingletonTest {
      */
     @Test
     fun test_callClassForName_verifyInstanceVal() {
+
 
         // retrieve the instance property using Class.forName() + Reflection
         val instanceVal = Class.forName("com.learner.designpatterns.creational.singleton.EarlyInitializationSingleton")

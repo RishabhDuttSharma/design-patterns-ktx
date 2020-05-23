@@ -21,11 +21,15 @@ import org.junit.Test
 
 
 /**
+ * Test Cases for [LazyInitializationSingleton]
  *
  * Created by Rishabh on 21-05-2020
  */
 internal class LazyInitializationSingletonTest {
 
+    /**
+     * Verifies that getInstance() method always returns same instance
+     */
     @Test
     fun test_getInstance() {
         val instance = LazyInitializationSingleton.getInstance()
