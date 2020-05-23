@@ -16,6 +16,10 @@
 
 package com.learner.designpatterns.creational.singleton
 
+/**
+ *
+ * Created by Rishabh on 21-05-2020
+ */
 class LazyInitializationSingleton private constructor() {
 
     companion object {

@@ -16,6 +16,17 @@
 
 package com.learner.designpatterns.creational.singleton
 
+
+/**
+ * Way to implement singleton, if target class constructor doesn't
+ * take any parameter(s) (i.e., a default constructor)
+ *
+ * The instance will be initialized upon any first call to this Class.
+ * Being inside a [Companion] (or Java static), will create an instance
+ * as soon as any reference is made to this Class.
+ *
+ * Created by Rishabh on 21-05-2020
+ */
 class EarlyInitializationSingleton private constructor() {
 
     companion object {

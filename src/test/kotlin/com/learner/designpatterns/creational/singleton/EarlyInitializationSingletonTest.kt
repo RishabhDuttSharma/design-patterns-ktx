@@ -20,12 +20,53 @@ import org.junit.Assert
 import org.junit.Test
 
 
+/**
+ *
+ * Created by Rishabh on 21-05-2020
+ */
 internal class EarlyInitializationSingletonTest {
 
+    /**
+     * Verifies that getInstance() method always returns same instance
+     */
     @Test
-    fun test_getInstance() {
+    fun test_getInstance_returnsSameInstanceEveryTime() {
         val instance = EarlyInitializationSingleton.getInstance()
         Assert.assertNotNull(instance)
         Assert.assertEquals(instance, EarlyInitializationSingleton.getInstance())
+    }
+
+    /**
+     * Verifies that the instance is created even if we don't directly touch the Class
+     */
+    @Test
+    fun test_callClassForName_verifyInstanceVal() {
+
+        // retrieve the instance property using Class.forName() + Reflection
+        val instanceVal = Class.forName("com.learner.designpatterns.creational.singleton.EarlyInitializationSingleton")
+            // by now instance will be created
+            .getDeclaredField("instance").apply {
+                isAccessible = true
+            }.get(null)
+
+        // the instance should be initialized as soon as Class.forName reaches given Class
+        Assert.assertNotNull(instanceVal)
+    }
+
+    /**
+     * Verifies that the instance is created even by just referring to Class in any way
+     * (e.g., any property or method (apart from getInstance))
+     */
+    @Test
+    fun test_callReflection_verifyInstanceVal() {
+        // retrieve the instance property using Reflection
+        val instanceVal = EarlyInitializationSingleton::class.java
+            // by now instance will be created
+            .getDeclaredField("instance").apply {
+                isAccessible = true
+            }.get(null)
+
+        // the instance should be initialized just before EarlyInitializationSingleton::class.java returns
+        Assert.assertNotNull(instanceVal)
     }
 }
