@@ -21,19 +21,19 @@ import org.junit.Test
 
 
 /**
- * Test Cases for [DoubleCheckedLockingSingleton]
+ * Test Cases for [LazyInitializationSingleton]
  *
  * Created by Rishabh on 21-05-2020
  */
-internal class DoubleCheckedLockingSingletonTest {
+internal class LazyInitializationSingletonTest {
 
     /**
      * Verifies that getInstance() method always returns same instance
      */
     @Test
-    fun test_getInstance_alwaysReturnsSameInstance() {
-        val instance = DoubleCheckedLockingSingleton.getInstance()
+    fun test_getInstance() {
+        val instance = LazyInitializationSingleton.getInstance()
         Assert.assertNotNull(instance)
-        Assert.assertEquals(instance, DoubleCheckedLockingSingleton.getInstance())
+        Assert.assertEquals(instance, LazyInitializationSingleton.getInstance())
     }
 }
