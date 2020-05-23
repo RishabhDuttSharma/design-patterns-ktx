@@ -46,8 +46,6 @@ internal class EarlyInitializationSingletonTest {
      */
     @Test
     fun test_callClassForName_verifyInstanceVal() {
-
-
         // retrieve the instance property using Class.forName() + Reflection
         val instanceVal = Class.forName("com.learner.designpatterns.creational.singleton.EarlyInitializationSingleton")
             // by now instance will be created

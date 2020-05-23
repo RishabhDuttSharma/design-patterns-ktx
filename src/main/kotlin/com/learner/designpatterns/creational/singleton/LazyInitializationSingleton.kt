@@ -21,10 +21,11 @@ package com.learner.designpatterns.creational.singleton
  * any parameters (i.e., a default constructor)
  *
  * It differs from early-initialization-singleton in the approach used in initialization.
- * Unlike early-initialization-singleton, it doesn't create the instance on any call.
- * It uses a instance-holder (or singleton-holder) to wrap the instance initialization
- * so that the instance is created only on the first call to instance-holder. Only
- * getInstance() method should call the instance-holder.
+ * Unlike early-initialization-singleton, it doesn't create the instance on any call to
+ * target class except for getInstance().
+ * It uses a instance-holder (or singleton-holder) to wrap the single instance and its
+ * initialization so that the instance is created only on the first call to instance-holder.
+ * Only getInstance() method should call the instance-holder.
  *
  * Since this approach creates the singleton only on demand,
  * it is called lazy-initialization-singleton.
