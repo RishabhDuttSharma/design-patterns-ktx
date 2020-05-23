@@ -38,7 +38,7 @@ class LazyInitializationSingleton private constructor() {
         /**
          * Wraps the single-instance and its initialization
          */
-        class InstanceHolder {
+        private class InstanceHolder {
             companion object {
                 internal val instance = LazyInitializationSingleton()
             }
