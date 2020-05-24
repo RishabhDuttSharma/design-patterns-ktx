@@ -16,8 +16,9 @@
 
 package com.learner.designpatterns.creational.singleton
 
-import org.junit.Assert
-import org.junit.Test
+import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions.assertNotNull
+import org.junit.jupiter.api.Test
 
 
 /**
@@ -33,7 +34,7 @@ internal class DoubleCheckedLockingSingletonTest {
     @Test
     fun test_getInstance_alwaysReturnsSameInstance() {
         val instance = DoubleCheckedLockingSingleton.getInstance()
-        Assert.assertNotNull(instance)
-        Assert.assertEquals(instance, DoubleCheckedLockingSingleton.getInstance())
+        assertNotNull(instance)
+        assertEquals(instance, DoubleCheckedLockingSingleton.getInstance())
     }
 }

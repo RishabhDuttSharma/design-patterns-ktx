@@ -16,29 +16,45 @@
 
 package com.learner.designpatterns.creational.factorymethod
 
+/** Created by Rishabh on 24-05-2020 */
+
 /**
- *
- * Created by Rishabh on 24-05-2020
+ * Defines an abstract layer for Factories that create specific Product.
  */
+interface IFactory {
 
-const val CAR_TYPE_SEDAN = "sedan"
-
-interface ICarFactory {
-    fun manufactureCar(): ICar
+    /**
+     * Factory method that actually creates Product
+     */
+    fun createProduct(): IProduct
 }
 
-interface ICar {
-    fun getType(): String
+
+/**
+ * Defines an abstraction for underlying class of Products.
+ */
+interface IProduct
+
+
+/**
+ * Concrete implementation of IProduct, features type "A".
+ */
+class ConcreteProductA : IProduct
+
+
+/**
+ * Concrete implementation of IFactory that deals with creation of ProductA.
+ *
+ * If Factories are just concerned with creating a new Product, they should be
+ * implemented as singleton. For Kotlin, we can implement below factory as object,
+ * instead of a class, so that we don't instantiate it over and again.
+ */
+class ConcreteProductAFactory : IFactory {
+
+    override fun createProduct() = ConcreteProductA()
 }
 
-class SedanCar : ICar {
-    override fun getType() = CAR_TYPE_SEDAN
-}
-
-class SedanCarFactory : ICarFactory {
-    override fun manufactureCar() = SedanCar()
-}
-
+/** playground */
 fun main() {
-    SedanCarFactory().manufactureCar()
+    ConcreteProductAFactory().createProduct()
 }
