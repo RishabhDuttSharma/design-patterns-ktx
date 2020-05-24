@@ -45,9 +45,9 @@ class ConcreteProductA : IProduct
 /**
  * Concrete implementation of IFactory that deals with creation of ProductA.
  *
- * If Factories are just concerned with creating a new Product, they should be
- * implemented as singleton. For Kotlin, we can implement below factory as object,
- * instead of a class, so that we don't instantiate it over and again.
+ * If Factories are concerned only with the creation of a new Product, they
+ * should be implemented as singleton. For Kotlin, we can implement below factory
+ * as object, instead of a class, so that we don't instantiate it over and again.
  */
 class ConcreteProductAFactory : IFactory {
 
@@ -56,5 +56,6 @@ class ConcreteProductAFactory : IFactory {
 
 /** playground */
 fun main() {
+
     ConcreteProductAFactory().createProduct()
 }
