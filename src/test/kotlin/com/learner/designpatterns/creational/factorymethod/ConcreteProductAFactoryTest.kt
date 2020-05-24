@@ -16,10 +16,34 @@
 
 package com.learner.designpatterns.creational.factorymethod
 
+import org.junit.jupiter.api.Assertions
+import org.junit.jupiter.api.Test
+
 /**
+ * Test Cases for [ConcreteProductAFactory]
+ *
  * Created by Rishabh on 24-05-2020
  */
 internal class ConcreteProductAFactoryTest {
 
+    /**
+     * Verifies that the Factory creates a non-null instance of Product
+     */
+    @Test
+    fun verify_createProduct_returnsProduct() {
+        Assertions.assertNotNull(ConcreteProductAFactory().createProduct())
+    }
 
+    /**
+     * Verifies that the Factories always creates a new Product
+     */
+    @Test
+    fun verify_createProduct_alwaysReturnNewProduct() {
+        val productA1 = ConcreteProductAFactory().createProduct()
+        val productA2 = ConcreteProductAFactory().createProduct()
+        Assertions.assertNotEquals(productA1, productA2)
+
+        val productA3 = ConcreteProductAFactory().createProduct()
+        Assertions.assertNotEquals(productA2, productA3)
+    }
 }
