@@ -119,7 +119,7 @@ class InterceptorChain(request: Request) : Chain(request) {
 }
 
 /**
- * Encodes the request, so that it can only be read by target Server
+ * Encodes the request-body, so that it can only be read by target Server
  */
 object EncodeRequestBodyInterceptor : Interceptor {
 
@@ -157,7 +157,7 @@ object DecodeResponseBodyInterceptor : Interceptor {
 }
 
 /**
- * Actual interceptor that makes call to Server, and return response
+ * Actual interceptor that makes call to Server, and returns response
  */
 object ServerCallInterceptor : Interceptor {
 
