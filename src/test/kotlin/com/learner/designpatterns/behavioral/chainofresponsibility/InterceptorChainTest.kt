@@ -16,8 +16,9 @@
 
 package com.learner.designpatterns.behavioral.chainofresponsibility
 
-import org.junit.Assert
-import org.junit.Test
+import org.junit.jupiter.api.Assertions.*
+import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.assertThrows
 
 /**
  * Test Cases for [InterceptorChain]
@@ -33,11 +34,9 @@ internal class InterceptorChainTest {
      */
     @Test
     fun proceed_noInterceptor_throwException() {
-        try {
+        assertThrows<Exception>("Reached end-of-chain! Response responsibility interceptor not found.") {
+            // without any interceptors, proceed should throw exception
             InterceptorChain(Request("Sample")).proceed()
-        } catch (ex: Exception) {
-            Assert.assertNotNull(ex)
-            Assert.assertEquals(ex.message, "Reached end-of-chain! Response responsibility interceptor not found.")
         }
     }
 
@@ -47,15 +46,36 @@ internal class InterceptorChainTest {
      */
     @Test
     fun proceed_noResponseInterceptor_throwsException() {
-        try {
+        assertThrows<Exception>("Reached end-of-chain! Response responsibility interceptor not found.") {
+            // without response interceptor, proceed should throw exception
             InterceptorChain(Request("Sample"))
                 .addInterceptor(EncodeRequestBodyInterceptor)
                 .addInterceptor(AuthorizationHeaderInterceptor)
                 .addInterceptor(DecodeResponseBodyInterceptor)
                 .proceed()
-        } catch (ex: Exception) {
-            Assert.assertNotNull(ex)
         }
+    }
+
+    /**
+     * Verifies that the InterceptorChain works successfully but returns invalid
+     * response when ServerCallInterceptor is placed in between other Interceptors.
+     */
+    @Test
+    fun proceed_responseInterceptorBetweenInterceptors_returnsInvalidResponse() {
+        val callBody = "Sample"
+        InterceptorChain(Request(callBody))
+            .addInterceptor(EncodeRequestBodyInterceptor)
+            .addInterceptor(AuthorizationHeaderInterceptor)
+            // response interceptor should always follow the rest
+            .addInterceptor(ServerCallInterceptor)
+            .addInterceptor(DecodeResponseBodyInterceptor)
+            .proceed().run {
+                // chain will still return response
+                assertNotNull(this)
+                assertNotNull(body)
+                // but the response will be malformed
+                assertNotEquals(callBody, body)
+            }
     }
 
     /**
@@ -64,20 +84,18 @@ internal class InterceptorChainTest {
      */
     @Test
     fun proceed_allInterceptors_returnsSuccess() {
-        try {
-            val callBody = "Sample"
-            InterceptorChain(Request(callBody))
-                .addInterceptor(EncodeRequestBodyInterceptor)
-                .addInterceptor(AuthorizationHeaderInterceptor)
-                .addInterceptor(DecodeResponseBodyInterceptor)
-                .addInterceptor(ServerCallInterceptor)
-                .proceed().run {
-                    Assert.assertNotNull(this)
-                    Assert.assertEquals(callBody, body)
-                }
-        } catch (ex: Exception) {
-            Assert.assertNull(ex)
-        }
+        val callBody = "Sample"
+        InterceptorChain(Request(callBody))
+            .addInterceptor(EncodeRequestBodyInterceptor)
+            .addInterceptor(AuthorizationHeaderInterceptor)
+            .addInterceptor(DecodeResponseBodyInterceptor)
+            // response interceptor should always follow the rest
+            .addInterceptor(ServerCallInterceptor)
+            .proceed().run {
+                assertNotNull(this)
+                // chain should return valid response
+                assertEquals(callBody, body)
+            }
     }
 
     /**
@@ -86,16 +104,13 @@ internal class InterceptorChainTest {
      */
     @Test
     fun proceed_responseInterceptor_returnsSuccess() {
-        try {
-            val callBody = "Sample"
-            InterceptorChain(Request(callBody))
-                .addInterceptor(ServerCallInterceptor)
-                .proceed().run {
-                    Assert.assertNotNull(this)
-                    Assert.assertEquals(callBody, body)
-                }
-        } catch (ex: Exception) {
-            Assert.assertNull(ex)
-        }
+        val callBody = "Sample"
+        InterceptorChain(Request(callBody))
+            .addInterceptor(ServerCallInterceptor)
+            .proceed().run {
+                assertNotNull(this)
+                // chain should return valid response
+                assertEquals(callBody, body)
+            }
     }
 }
