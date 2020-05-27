@@ -98,6 +98,7 @@ abstract class Chain(var request: Request) {
      *
      * @return the response of execution.
      */
+    @Throws(Exception::class)
     abstract fun proceed(): Response
 }
 
@@ -108,7 +109,8 @@ class InterceptorChain(request: Request) : Chain(request) {
 
     private val interceptorQueue = LinkedBlockingQueue<Interceptor>()
 
-    override fun proceed() = interceptorQueue.poll().intercept(this)
+    override fun proceed() = interceptorQueue.poll()?.intercept(this)
+        ?: throw Exception("Reached end-of-chain! Response responsibility interceptor not found.")
 
     /**
      * Adds an [Interceptor] to the Chain
