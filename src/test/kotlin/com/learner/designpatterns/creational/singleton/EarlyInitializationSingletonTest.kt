@@ -16,8 +16,9 @@
 
 package com.learner.designpatterns.creational.singleton
 
-import org.junit.Assert
-import org.junit.Test
+import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions.assertNotNull
+import org.junit.jupiter.api.Test
 
 
 /**
@@ -35,8 +36,8 @@ internal class EarlyInitializationSingletonTest {
     @Test
     fun test_getInstance_alwaysReturnsSameInstance() {
         val instance = EarlyInitializationSingleton.getInstance()
-        Assert.assertNotNull(instance)
-        Assert.assertEquals(instance, EarlyInitializationSingleton.getInstance())
+        assertNotNull(instance)
+        assertEquals(instance, EarlyInitializationSingleton.getInstance())
 
         mInstance = instance
     }
@@ -54,7 +55,7 @@ internal class EarlyInitializationSingletonTest {
             }.get(null)
 
         // the instance should be initialized as soon as Class.forName reaches given Class
-        Assert.assertNotNull(instanceVal)
+        assertNotNull(instanceVal)
     }
 
     /**
@@ -71,6 +72,6 @@ internal class EarlyInitializationSingletonTest {
             }.get(null)
 
         // the instance should be initialized just before EarlyInitializationSingleton::class.java returns
-        Assert.assertNotNull(instanceVal)
+        assertNotNull(instanceVal)
     }
 }
