@@ -55,30 +55,47 @@ class WindowsButton : IButton {
 }
 
 // Factory
-interface IDialog {
+abstract class IDialog {
 
-    fun renderDialog() {
-        // create a new button (using factory-method)
-        val button = createButton()
+    private lateinit var okButton: IButton
+
+    fun render() {
+        // create Button using factory-method
+        okButton = createButton()
         // draw the button on screen
-        button.draw()
-        // use when required
-        button.onClick()
+        okButton.draw()
+    }
+
+    fun performActionEvent() {
+        // invoke the on-click event for Button
+        okButton.onClick()
     }
 
     // Factory-method
-    fun createButton(): IButton
+    abstract fun createButton(): IButton
 }
 
-class WindowsDialog : IDialog {
+class WindowsDialog : IDialog() {
     override fun createButton(): IButton = WindowsButton()
 }
 
-class MacOsDialog : IDialog {
+class MacOsDialog : IDialog() {
     override fun createButton(): IButton = MacOsButton()
 }
 
 fun main() {
-    WindowsDialog().renderDialog()
-    MacOsDialog().renderDialog()
+
+    WindowsDialog().run {
+        // show dialog
+        render()
+        // perform click on the ok-button
+        performActionEvent()
+    }
+
+    MacOsDialog().run {
+        // show dialog
+        render()
+        // perform click on the ok-button
+        performActionEvent()
+    }
 }
