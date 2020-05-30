@@ -24,7 +24,7 @@ package com.learner.designpatterns.creational.factorymethod
  * For each GUI component, it would have a specific implementation for
  * each of the platforms.
  *
- * A Button, for instance, would have two different implementations each
+ * A Button, for instance, would have two different implementations, each
  * for Windows and MacOS, assuming the library supports both of them.
  * To maintain the contract, an abstract layer for Button would be required
  * for the concrete implementations.
