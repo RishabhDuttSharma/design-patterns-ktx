@@ -20,7 +20,7 @@ package com.learner.designpatterns.creational.factorymethod
  * Cross Platform GUI
  * -------------------
  *
- * A cross-platform gui library may have support to several platforms.
+ * A cross-platform gui library may have support for several platforms.
  * For each GUI component, it would have a specific implementation for
  * each of the platforms.
  *
@@ -93,10 +93,10 @@ abstract class IDialog {
     }
 
     /**
-     * Factory-Method for creating the Button
+     * Factory-Method for creating platform specific Button
      *
-     * NOTE: This method must be implemented by sub-classes to return
-     * an appropriate instance of [IButton]
+     * NOTE: This method must be implemented by sub-classes to create
+     * and return an appropriate instance of [IButton]
      *
      * @return instance of [IButton]
      */
@@ -133,7 +133,7 @@ fun main() {
 }
 
 /**
- * Represents the Platforms supported by GUI-Library
+ * Enumeration to wrap the Platforms supported by GUI-Library
  */
 enum class Platform {
     WINDOWS, MAC_OS
