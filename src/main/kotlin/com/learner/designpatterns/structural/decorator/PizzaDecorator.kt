@@ -67,6 +67,9 @@ interface IPizza {
     fun getCost(): Int
 }
 
+/**
+ * Concrete Pizza implementation for type - Margherita
+ */
 class MargheritaPizza : IPizza {
 
     override fun getName() = "Margherita"
@@ -74,6 +77,9 @@ class MargheritaPizza : IPizza {
     override fun getCost() = 200
 }
 
+/**
+ * Concrete Pizza implementation for type - Farmhouse
+ */
 class FarmhousePizza : IPizza {
 
     override fun getName() = "Farmhouse"
@@ -81,6 +87,9 @@ class FarmhousePizza : IPizza {
     override fun getCost() = 300
 }
 
+/**
+ * Concrete Pizza implementation for type - Mexican Green Wave
+ */
 class MexicanGreenWavePizza : IPizza {
 
     override fun getName() = "Mexican Green Wave"
@@ -133,16 +142,21 @@ class ExtraVeggiesDecorator(pizza: IPizza) : PizzaDecorator(pizza) {
 /** playground */
 fun main() {
 
+    // choose a random pizza-type
     when (PizzaType.values().random()) {
+        // create a new instance of pizza
         PizzaType.MARGHERITA -> MargheritaPizza()
         PizzaType.FARMHOUSE -> FarmhousePizza()
         PizzaType.MEXICAN_GREEN_WAVE -> MexicanGreenWavePizza()
     }.let { pizza ->
+        // choose a random customization-type
         when (CustomizationType.values().random()) {
+            // wrap pizza in customization-decorator
             CustomizationType.EXTRA_CHEESE_TOPPING -> ExtraCheeseDecorator(pizza)
             CustomizationType.EXTRA_VEGGIES_TOPPING -> ExtraVeggiesDecorator(pizza)
         }
     }.let { decoratedPizza ->
+        // display specs of decorated-pizza
         println("Items: ${decoratedPizza.getName()}")
         println("Total Cost: ${decoratedPizza.getCost()}")
     }
