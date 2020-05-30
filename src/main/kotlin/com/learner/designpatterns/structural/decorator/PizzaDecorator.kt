@@ -70,7 +70,7 @@ interface IPizza {
 /**
  * Concrete Pizza implementation for type - Margherita
  */
-class MargheritaPizza : IPizza {
+object MargheritaPizza : IPizza {
 
     override fun getName() = "Margherita"
 
@@ -80,7 +80,7 @@ class MargheritaPizza : IPizza {
 /**
  * Concrete Pizza implementation for type - Farmhouse
  */
-class FarmhousePizza : IPizza {
+object FarmhousePizza : IPizza {
 
     override fun getName() = "Farmhouse"
 
@@ -90,7 +90,7 @@ class FarmhousePizza : IPizza {
 /**
  * Concrete Pizza implementation for type - Mexican Green Wave
  */
-class MexicanGreenWavePizza : IPizza {
+object MexicanGreenWavePizza : IPizza {
 
     override fun getName() = "Mexican Green Wave"
 
@@ -145,9 +145,9 @@ fun main() {
     // choose a random pizza-type
     when (PizzaType.values().random()) {
         // create a new instance of pizza
-        PizzaType.MARGHERITA -> MargheritaPizza()
-        PizzaType.FARMHOUSE -> FarmhousePizza()
-        PizzaType.MEXICAN_GREEN_WAVE -> MexicanGreenWavePizza()
+        PizzaType.MARGHERITA -> MargheritaPizza
+        PizzaType.FARMHOUSE -> FarmhousePizza
+        PizzaType.MEXICAN_GREEN_WAVE -> MexicanGreenWavePizza
     }.let { pizza ->
         // choose a random customization-type
         when (CustomizationType.values().random()) {
