@@ -49,6 +49,7 @@ internal class InterceptorChainTest {
         assertThrows<Exception>("Reached end-of-chain! Response responsibility interceptor not found.") {
             // without response interceptor, proceed should throw exception
             InterceptorChain(Request("Sample"))
+                .addInterceptor(LoggingInterceptor)
                 .addInterceptor(EncodeRequestBodyInterceptor)
                 .addInterceptor(AuthorizationHeaderInterceptor)
                 .addInterceptor(DecodeResponseBodyInterceptor)
@@ -64,6 +65,7 @@ internal class InterceptorChainTest {
     fun proceed_responseInterceptorBetweenInterceptors_returnsInvalidResponse() {
         val callBody = "Sample"
         InterceptorChain(Request(callBody))
+            .addInterceptor(LoggingInterceptor)
             .addInterceptor(EncodeRequestBodyInterceptor)
             .addInterceptor(AuthorizationHeaderInterceptor)
             // response interceptor should always follow the rest
@@ -86,6 +88,7 @@ internal class InterceptorChainTest {
     fun proceed_allInterceptors_returnsSuccess() {
         val callBody = "Sample"
         InterceptorChain(Request(callBody))
+            .addInterceptor(LoggingInterceptor)
             .addInterceptor(EncodeRequestBodyInterceptor)
             .addInterceptor(AuthorizationHeaderInterceptor)
             .addInterceptor(DecodeResponseBodyInterceptor)

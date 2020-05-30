@@ -121,6 +121,18 @@ class InterceptorChain(request: Request) : Chain(request) {
 }
 
 /**
+ * Logs the request-body and response-body
+ */
+object LoggingInterceptor : Interceptor {
+
+    override fun intercept(chain: Chain) = chain.also {
+        println("Request-Body : ${chain.request.body}")
+    }.proceed().also {
+        println("Response-Body : ${it.body}")
+    }
+}
+
+/**
  * Encodes the request-body, so that it can only be read by target Server
  */
 object EncodeRequestBodyInterceptor : Interceptor {
@@ -168,11 +180,10 @@ object ServerCallInterceptor : Interceptor {
 
 fun main() {
     InterceptorChain(Request("Sample"))
+        .addInterceptor(LoggingInterceptor)
         .addInterceptor(EncodeRequestBodyInterceptor)
         .addInterceptor(AuthorizationHeaderInterceptor)
         .addInterceptor(DecodeResponseBodyInterceptor)
         .addInterceptor(ServerCallInterceptor)
-        .proceed().run {
-            println(body)
-        }
+        .proceed()
 }
