@@ -64,7 +64,7 @@ interface IButton {
  */
 class MacOsButton : IButton {
 
-    override fun draw() = println("MacOS -> Drawing Button using XCode Tools...")
+    override fun draw() = print("MacOS -> Drawing Button using XCode Tools...")
 }
 
 /**
@@ -72,7 +72,7 @@ class MacOsButton : IButton {
  */
 class WindowsButton : IButton {
 
-    override fun draw() = println("Windows -> Drawing Button using VisualStudio Tools...")
+    override fun draw() = print("Windows -> Drawing Button using VisualStudio Tools...")
 }
 
 /**
