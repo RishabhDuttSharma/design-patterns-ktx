@@ -35,8 +35,9 @@ internal class InterceptorChainTest {
     @Test
     fun proceed_noInterceptor_throwException() {
         assertThrows<Exception>("Reached end-of-chain! Response responsibility interceptor not found.") {
+            val requestBody = RequestBody.GET_USER.name
             // without any interceptors, proceed should throw exception
-            InterceptorChain(Request("Sample")).proceed()
+            InterceptorChain(Request(requestBody)).proceed()
         }
     }
 
@@ -47,12 +48,29 @@ internal class InterceptorChainTest {
     @Test
     fun proceed_noResponseInterceptor_throwsException() {
         assertThrows<Exception>("Reached end-of-chain! Response responsibility interceptor not found.") {
+            val requestBody = RequestBody.GET_USER.name
             // without response interceptor, proceed should throw exception
-            InterceptorChain(Request("Sample"))
+            InterceptorChain(Request(requestBody))
                 .addInterceptor(LoggingInterceptor)
                 .addInterceptor(EncodeRequestBodyInterceptor)
                 .addInterceptor(AuthorizationHeaderInterceptor)
                 .addInterceptor(DecodeResponseBodyInterceptor)
+                .proceed()
+        }
+    }
+
+    /**
+     * Verifies that the InterceptorChain throws exception if there are
+     * no Request-Encoding and Response-Decoding Interceptors and only
+     * ServerCallInterceptor is present.
+     */
+    @Test
+    fun proceed_onlyResponseInterceptor_throwsException() {
+        assertThrows<Exception> {
+            val requestBody = RequestBody.GET_USER.name
+            InterceptorChain(Request(requestBody))
+                // requires request-encoder and response-decoder
+                .addInterceptor(ServerCallInterceptor)
                 .proceed()
         }
     }
@@ -63,8 +81,8 @@ internal class InterceptorChainTest {
      */
     @Test
     fun proceed_responseInterceptorBetweenInterceptors_returnsInvalidResponse() {
-        val callBody = "Sample"
-        InterceptorChain(Request(callBody))
+        val getUserRequestBody = RequestBody.GET_USER.name
+        InterceptorChain(Request(getUserRequestBody))
             .addInterceptor(LoggingInterceptor)
             .addInterceptor(EncodeRequestBodyInterceptor)
             .addInterceptor(AuthorizationHeaderInterceptor)
@@ -76,7 +94,7 @@ internal class InterceptorChainTest {
                 assertNotNull(this)
                 assertNotNull(body)
                 // but the response will be malformed
-                assertNotEquals(callBody, body)
+                assertNotEquals(WebApiServer.RESPONSE_GET_USER, body)
             }
     }
 
@@ -86,34 +104,34 @@ internal class InterceptorChainTest {
      */
     @Test
     fun proceed_allInterceptors_returnsSuccess() {
-        val callBody = "Sample"
-        InterceptorChain(Request(callBody))
-            .addInterceptor(LoggingInterceptor)
-            .addInterceptor(EncodeRequestBodyInterceptor)
-            .addInterceptor(AuthorizationHeaderInterceptor)
-            .addInterceptor(DecodeResponseBodyInterceptor)
-            // response interceptor should always follow the rest
-            .addInterceptor(ServerCallInterceptor)
-            .proceed().run {
-                assertNotNull(this)
-                // chain should return valid response
-                assertEquals(callBody, body)
-            }
-    }
 
-    /**
-     * Verifies that the InterceptorChain works successfully even if there are
-     * no Interceptors except ServerCallInterceptor which actually returns response.
-     */
-    @Test
-    fun proceed_responseInterceptor_returnsSuccess() {
-        val callBody = "Sample"
-        InterceptorChain(Request(callBody))
-            .addInterceptor(ServerCallInterceptor)
-            .proceed().run {
-                assertNotNull(this)
-                // chain should return valid response
-                assertEquals(callBody, body)
-            }
+        /** executes chain with given request-body, and performs assertion with expectedResponseBody */
+        fun executeAndAssertChain(requestBody: String, expectedResponseBody: String) {
+
+            InterceptorChain(Request(requestBody))
+                .addInterceptor(LoggingInterceptor)
+                .addInterceptor(EncodeRequestBodyInterceptor)
+                .addInterceptor(DecodeResponseBodyInterceptor)
+                .addInterceptor(AuthorizationHeaderInterceptor)
+                // response interceptor should always follow the rest
+                .addInterceptor(ServerCallInterceptor)
+                .proceed().run {
+                    assertNotNull(this)
+                    // chain should return valid response
+                    assertEquals(expectedResponseBody, body)
+                }
+        }
+
+        // execute and assert get-user-request
+        val getUserRequestBody = RequestBody.GET_USER.name
+        executeAndAssertChain(getUserRequestBody, WebApiServer.RESPONSE_GET_USER)
+
+        // execute and assert post-user-request
+        val postUserRequestBody = RequestBody.POST_USER.name
+        executeAndAssertChain(postUserRequestBody, WebApiServer.RESPONSE_POST_USER)
+
+        // execute and assert random request
+        val anonymousRequestBody = "anonymous"
+        executeAndAssertChain(anonymousRequestBody, WebApiServer.RESPONSE_UNKNOWN)
     }
 }
