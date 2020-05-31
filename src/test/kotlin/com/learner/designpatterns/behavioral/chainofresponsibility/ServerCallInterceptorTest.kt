@@ -16,14 +16,38 @@
 
 package com.learner.designpatterns.behavioral.chainofresponsibility
 
+import io.mockk.every
+import io.mockk.mockk
+import org.assertj.core.api.Assertions
 import org.junit.jupiter.api.Test
 
 /**
+ * Test Cases for [ServerCallInterceptor]
+ *
  * Created by Rishabh on 31-05-2020
  */
 internal class ServerCallInterceptorTest {
 
+    /**
+     * Verifies that the [ServerCallInterceptor] executes a request and
+     * returns corresponding response
+     */
     @Test
     fun intercept() {
+
+        // create request-body
+        val targetRequestBody = EncoderDecoder.encode(RequestBody.GET_USER.name)
+        // create expected response-body
+        val expectedResponseBody = EncoderDecoder.encode(WebApiServer.RESPONSE_GET_USER)
+
+        // create mock interceptor chain
+        mockk<InterceptorChain>().apply {
+            // mock request
+            every { request } returns Request(targetRequestBody)
+            // intercept the call, and execute API-Call
+        }.let(ServerCallInterceptor::intercept).run {
+            // returned response-body should match expected response-body
+            Assertions.assertThat(body).isEqualTo(expectedResponseBody)
+        }
     }
 }
