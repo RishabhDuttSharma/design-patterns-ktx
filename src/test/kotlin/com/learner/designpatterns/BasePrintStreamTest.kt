@@ -14,11 +14,10 @@
  * limitations under the License.
  */
 
-package com.learner.designpatterns.creational.factorymethod
+package com.learner.designpatterns
 
 import org.junit.jupiter.api.AfterAll
 import org.junit.jupiter.api.BeforeAll
-import org.junit.jupiter.api.TestInstance
 import java.io.ByteArrayOutputStream
 import java.io.PrintStream
 
@@ -29,7 +28,6 @@ import java.io.PrintStream
  *
  * Created by Rishabh on 30-05-2020
  */
-@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 open class BasePrintStreamTest {
 
     private val consoleOut = ByteArrayOutputStream()

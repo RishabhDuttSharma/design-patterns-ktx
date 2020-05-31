@@ -16,6 +16,7 @@
 
 package com.learner.designpatterns.creational.factorymethod
 
+import com.learner.designpatterns.BasePrintStreamTest
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Test
 
