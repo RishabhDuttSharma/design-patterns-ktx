@@ -20,10 +20,15 @@ import org.assertj.core.api.Assertions
 import org.junit.jupiter.api.Test
 
 /**
+ * Test Cases for [EncoderDecoder]
+ *
  * Created by Rishabh on 01-06-2020
  */
 internal class EncoderDecoderTest {
 
+    /**
+     * Verifies that the data encoded and decoded by [EncoderDecoder] is correct.
+     */
     @Test
     fun encodeDecode_validInput_returnsSuccess() {
         val testInput = "sample"
