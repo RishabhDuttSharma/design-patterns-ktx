@@ -22,10 +22,16 @@ import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 
 /**
+ * Test Cases for [AuthorizationHeaderInterceptor]
+ *
  * Created by Rishabh on 31-05-2020
  */
 internal class AuthorizationHeaderInterceptorTest {
 
+    /**
+     * Verifies that the Headers are set to Request in chain after
+     * intercept by AuthorizationHeaderInterceptor
+     */
     @Test
     fun intercept() {
 

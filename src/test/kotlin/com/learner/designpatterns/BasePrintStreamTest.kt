@@ -18,8 +18,6 @@ package com.learner.designpatterns
 
 import org.junit.jupiter.api.AfterAll
 import org.junit.jupiter.api.BeforeAll
-import java.io.ByteArrayOutputStream
-import java.io.PrintStream
 
 /**
  * Base Class to facilitate testing the values printed to the Console
@@ -30,19 +28,16 @@ import java.io.PrintStream
  */
 open class BasePrintStreamTest {
 
-    private val consoleOut = ByteArrayOutputStream()
-    private val consoleErr = ByteArrayOutputStream()
-
-    private val actualSystemOut = System.out
-    private val actualSystemErr = System.err
+    private val outStream = PrintStreamDecorator(System.out)
+    private val errStream = PrintStreamDecorator(System.err)
 
     /**
      * Sets up custom output stream, and error stream
      */
     @BeforeAll
     fun setUpStreams() {
-        System.setOut(PrintStream(consoleOut))
-        System.setErr(PrintStream(consoleErr))
+        System.setOut(outStream)
+        System.setErr(errStream)
     }
 
     /**
@@ -50,28 +45,17 @@ open class BasePrintStreamTest {
      */
     @AfterAll
     fun restoreStreams() {
-        System.setOut(actualSystemOut)
-        System.setErr(actualSystemErr)
+        System.setOut(outStream.getDecoratedPrintStream())
+        System.setErr(errStream.getDecoratedPrintStream())
     }
 
     /**
      * @return the Output data printed in console since last call to this method
      */
-    protected fun getConsoleOutput() = getConsoleAndReset(consoleOut)
+    protected fun getConsoleOutput() = outStream.getConsoleData()
 
     /**
      * @return the Error data printed in console since last call to this method
      */
-    protected fun getConsoleError() = getConsoleAndReset(consoleErr)
-
-    /**
-     * Gets data from console and resets it
-     *
-     * @return current data in the Console
-     */
-    private fun getConsoleAndReset(console: ByteArrayOutputStream): String {
-        val consoleData = console.toString()
-        console.reset()
-        return consoleData
-    }
+    protected fun getConsoleError() = errStream.getConsoleData()
 }
