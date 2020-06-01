@@ -121,16 +121,25 @@ class InterceptorChain(request: Request) : Chain(request) {
 }
 
 /**
+ * Logs the request-body and response-body
+ */
+object LoggingInterceptor : Interceptor {
+
+    override fun intercept(chain: Chain) = chain.also {
+        println("Request-Body : ${chain.request.body}")
+    }.proceed().also {
+        println("Response-Body : ${it.body}")
+    }
+}
+
+/**
  * Encodes the request-body, so that it can only be read by target Server
  */
 object EncodeRequestBodyInterceptor : Interceptor {
 
     override fun intercept(chain: Chain) = chain.apply {
-        val arrRequestBody = request.body.toByteArray()
-        // encode request body
-        val newRequestBody = Base64.getEncoder().encodeToString(arrRequestBody)
         // since request-body is immutable, re-create Request with new body
-        request = Request(newRequestBody)
+        request = Request(EncoderDecoder.encode(request.body))
     }.proceed()
 }
 
@@ -150,12 +159,8 @@ object AuthorizationHeaderInterceptor : Interceptor {
 object DecodeResponseBodyInterceptor : Interceptor {
 
     override fun intercept(chain: Chain) = chain.proceed().run {
-        val arrResponseBody = body.toByteArray()
-        // decodes the response
-        val arrDecodedBody = Base64.getDecoder().decode(arrResponseBody)
-        // since response-body is immutable, re-create response with new body
-        Response(String(arrDecodedBody))
-    }
+        EncoderDecoder.decode(body)
+    }.let(::Response)
 }
 
 /**
@@ -163,16 +168,79 @@ object DecodeResponseBodyInterceptor : Interceptor {
  */
 object ServerCallInterceptor : Interceptor {
 
-    override fun intercept(chain: Chain) = Response(chain.request.body)
+    override fun intercept(chain: Chain) = chain.request.run {
+        WebApiServer.processRequest(body)
+    }.let(::Response)
 }
 
 fun main() {
-    InterceptorChain(Request("Sample"))
+
+    // create-request-body
+    val requestBody = RequestBody.values().random().name
+
+    // create request and pass it to interceptor-chain
+    InterceptorChain(Request(requestBody))
+        .addInterceptor(LoggingInterceptor)
         .addInterceptor(EncodeRequestBodyInterceptor)
         .addInterceptor(AuthorizationHeaderInterceptor)
         .addInterceptor(DecodeResponseBodyInterceptor)
         .addInterceptor(ServerCallInterceptor)
-        .proceed().run {
-            println(body)
-        }
+        .proceed()
+}
+
+/*====================== helper code ==========================*/
+
+/**
+ * Dummy WebServer that processes requests and returns response
+ */
+object WebApiServer {
+
+    const val RESPONSE_GET_USER = "Rishabh"
+    const val RESPONSE_POST_USER = "Success"
+    const val RESPONSE_UNKNOWN = "Unknown"
+
+    /**
+     * Processes requests and returns response
+     */
+    fun processRequest(encodedRequestBody: String): String =
+        EncoderDecoder.decode(encodedRequestBody).let { requestBody ->
+            try {
+                RequestBody.valueOf(requestBody)
+            } catch (ex: Exception) {
+                null
+            }
+        }.let {
+            when (it) {
+                RequestBody.GET_USER -> RESPONSE_GET_USER
+                RequestBody.POST_USER -> RESPONSE_POST_USER
+                else -> RESPONSE_UNKNOWN
+            }
+        }.let(EncoderDecoder::encode)
+}
+
+/**
+ * Enumeration to wrap request-body-types
+ */
+enum class RequestBody {
+    GET_USER, POST_USER
+}
+
+/**
+ * Singleton to handle encoding and decoding of data
+ */
+object EncoderDecoder {
+
+    /**
+     * Encodes input, and returns it
+     *
+     * @return encoded form of input
+     */
+    fun encode(input: String): String = Base64.getEncoder().encodeToString(input.toByteArray())
+
+    /**
+     * Decodes input, and returns it
+     *
+     * @return decoded form of input
+     */
+    fun decode(input: String): String = String(Base64.getDecoder().decode(input))
 }
