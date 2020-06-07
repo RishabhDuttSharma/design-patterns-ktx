@@ -20,16 +20,27 @@ package com.learner.designpatterns.behavioral.visitor
  *
  * Created by Rishabh on 07-06-2020
  */
-
 interface SystemDiagnosticsVisitor {
 
-    fun visit(system: StorageSystem)
+    /**
+     * Visits IO-System for Diagnostics
+     */
+    fun visit(system: InputOutputSystem)
 
+    /**
+     * Visits Network-System for Diagnostics
+     */
     fun visit(system: NetworkSystem)
 
+    /**
+     * Visits Processing-System for Diagnostics
+     */
     fun visit(system: ProcessingSystem)
 
-    fun visit(system: InputOutputSystem)
+    /**
+     * Visits Storage-System for Diagnostics
+     */
+    fun visit(system: StorageSystem)
 }
 
 interface System {
