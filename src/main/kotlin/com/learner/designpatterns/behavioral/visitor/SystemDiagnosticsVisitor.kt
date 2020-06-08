@@ -16,6 +16,9 @@
 
 package com.learner.designpatterns.behavioral.visitor
 
+import java.io.IOException
+import java.net.ConnectException
+
 /**
  *
  * Created by Rishabh on 07-06-2020
@@ -36,42 +39,50 @@ interface SystemDiagnosticsVisitor {
      * Visits Processing-System for Diagnostics
      */
     fun visit(system: ProcessingSystem)
-
-    /**
-     * Visits Storage-System for Diagnostics
-     */
-    fun visit(system: StorageSystem)
 }
 
-interface System {
+interface HostSystem {
 
-    fun accept(visitor: SystemDiagnosticsVisitor)
+    fun accept(diagnosticsVisitor: SystemDiagnosticsVisitor)
 }
 
-class StorageSystem : System {
+class NetworkSystem : HostSystem {
 
-    override fun accept(visitor: SystemDiagnosticsVisitor) {
-        visitor.visit(this)
+    @Throws(ConnectException::class)
+    fun connect(host: String, port: String) {
+        TODO("Not implemented yet!")
+    }
+
+    override fun accept(diagnosticsVisitor: SystemDiagnosticsVisitor) {
+        diagnosticsVisitor.visit(this)
     }
 }
 
-class NetworkSystem : System {
+class ProcessingSystem : HostSystem {
 
-    override fun accept(visitor: SystemDiagnosticsVisitor) {
-        visitor.visit(this)
+    @Throws(Exception::class)
+    fun execute(runnable: Runnable) {
+        TODO("Not implemented yet!")
+    }
+
+    override fun accept(diagnosticsVisitor: SystemDiagnosticsVisitor) {
+        diagnosticsVisitor.visit(this)
     }
 }
 
-class ProcessingSystem : System {
+class InputOutputSystem : HostSystem {
 
-    override fun accept(visitor: SystemDiagnosticsVisitor) {
-        visitor.visit(this)
+    @Throws(IOException::class)
+    fun read(): String {
+        TODO("Not implemented yet!")
     }
-}
 
-class InputOutputSystem : System {
+    @Throws(IOException::class)
+    fun write(data: String) {
+        TODO("Not implemented yet!")
+    }
 
-    override fun accept(visitor: SystemDiagnosticsVisitor) {
-        visitor.visit(this)
+    override fun accept(diagnosticsVisitor: SystemDiagnosticsVisitor) {
+        diagnosticsVisitor.visit(this)
     }
 }
