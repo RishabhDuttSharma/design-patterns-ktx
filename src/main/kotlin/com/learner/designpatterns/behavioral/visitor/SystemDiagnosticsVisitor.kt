@@ -18,6 +18,7 @@ package com.learner.designpatterns.behavioral.visitor
 
 import java.io.IOException
 import java.net.ConnectException
+import java.util.regex.Pattern
 
 /**
  *
@@ -49,8 +50,19 @@ interface HostSystem {
 class NetworkSystem : HostSystem {
 
     @Throws(ConnectException::class)
-    fun connect(host: String, port: String) {
-        TODO("Not implemented yet!")
+    fun connect(ipAddress: String, port: String) {
+
+        val ipAddressPattern = Pattern.compile("([0-9]{1,3}\\.){3}([0-9]{1,3})")
+        if (!ipAddressPattern.matcher(ipAddress).matches()) {
+            throw ConnectException("Invalid IP Address")
+        }
+
+        val portNumber = port.toIntOrNull()
+        if (portNumber == null || 65535 < portNumber || portNumber < 1) {
+            throw ConnectException("Invalid Port Number")
+        }
+
+        println("Connection successful")
     }
 
     override fun accept(diagnosticsVisitor: SystemDiagnosticsVisitor) {
@@ -62,7 +74,7 @@ class ProcessingSystem : HostSystem {
 
     @Throws(Exception::class)
     fun execute(runnable: Runnable) {
-        TODO("Not implemented yet!")
+
     }
 
     override fun accept(diagnosticsVisitor: SystemDiagnosticsVisitor) {
@@ -86,3 +98,5 @@ class InputOutputSystem : HostSystem {
         diagnosticsVisitor.visit(this)
     }
 }
+
+class HostException() : Exception()
