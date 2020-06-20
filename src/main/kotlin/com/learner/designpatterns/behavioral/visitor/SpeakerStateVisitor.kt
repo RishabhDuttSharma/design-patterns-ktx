@@ -19,9 +19,9 @@ package com.learner.designpatterns.behavioral.visitor
 /**
  * Represents a Speaker.
  *
- * It accepts a [SpeakerVisitor] to allow addition of new-behaviour
+ * It accepts a [SpeakerStateVisitor] to allow addition of new-behaviour
  * at run-time. Behaviour may differ across various implementations
- * of [SpeakerVisitor].
+ * of [SpeakerStateVisitor].
  *
  * Created by Rishabh on 15-06-2020
  */
@@ -35,10 +35,10 @@ class Speaker(private val name: String) {
         }
 
     /**
-     * Accepts a [SpeakerVisitor] (e.g., from outside), and asks it to visit
+     * Accepts a [SpeakerStateVisitor] (e.g., from outside), and asks it to visit
      * this instance of [Speaker] to perform intended operation
      */
-    fun accept(visitor: SpeakerVisitor) {
+    fun accept(visitor: SpeakerStateVisitor) {
         visitor.visit(this)
     }
 }
@@ -46,10 +46,10 @@ class Speaker(private val name: String) {
 /**
  * Defines the contract for implementing a Visitor for [Speaker]
  *
- * A [Speaker] accepts an instance of [SpeakerVisitor] to allow
+ * A [Speaker] accepts an instance of [SpeakerStateVisitor] to allow
  * execution of a new behaviour at runtime
  */
-interface SpeakerVisitor {
+interface SpeakerStateVisitor {
 
     /**
      * Visits a [Speaker], and performs required operation on it
@@ -60,10 +60,10 @@ interface SpeakerVisitor {
 /**
  * Defines PLAY runtime-behaviour on the [Speaker].
  *
- * Concrete implementation of [SpeakerVisitor] that visits a [Speaker],
+ * Concrete implementation of [SpeakerStateVisitor] that visits a [Speaker],
  * and starts playing it.
  */
-class PlayVisitor : SpeakerVisitor {
+class SpeakerPlayVisitor : SpeakerStateVisitor {
 
     /**
      * Visits [speaker], and resumes it by setting its state to "playing"
@@ -76,10 +76,10 @@ class PlayVisitor : SpeakerVisitor {
 /**
  * Defines PAUSE runtime-behaviour on the [Speaker].
  *
- * Concrete implementation of [SpeakerVisitor] that visits a [Speaker],
+ * Concrete implementation of [SpeakerStateVisitor] that visits a [Speaker],
  * and pauses it.
  */
-class PauseVisitor : SpeakerVisitor {
+class SpeakerPauseVisitor : SpeakerStateVisitor {
 
     /**
      * Visits [speaker], and temporarily interrupts it by setting its
@@ -93,10 +93,10 @@ class PauseVisitor : SpeakerVisitor {
 /**
  * Defines STOP runtime-behaviour on the [Speaker]
  *
- * Concrete implementation of [SpeakerVisitor] that visits a [Speaker]
+ * Concrete implementation of [SpeakerStateVisitor] that visits a [Speaker]
  * and stops it.
  */
-class StopVisitor : SpeakerVisitor {
+class SpeakerStopVisitor : SpeakerStateVisitor {
 
     /**
      * Visits [speaker], and interrupts it by setting its state to "stopped"
@@ -111,7 +111,7 @@ fun main() {
     // creates a speaker
     val speaker = Speaker("Bose")
     // creates a list of visitors
-    val visitors = arrayOf(PlayVisitor(), PauseVisitor(), StopVisitor())
+    val visitors = arrayOf(SpeakerPlayVisitor(), SpeakerPauseVisitor(), SpeakerStopVisitor())
     // asks the speaker to accepts visitors to change its state
     visitors.forEach(speaker::accept)
 }
