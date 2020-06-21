@@ -16,14 +16,39 @@
 
 package com.learner.designpatterns.behavioral.visitor
 
+
+/**
+ * SpeakerStateVisitor
+ * --------------------
+ * A Speaker system can be switched between various states e.g., playing,
+ * paused, stopped, etc. Apart from these states, it might be required to
+ * have additional behaviours. Implementing these behaviours directly into
+ * the class can violate both Open-Close and Single-Responsibility principle.
+ *
+ * To counter this problem, we can define a contract in such a way that
+ * whenever a new functionality is required, it can be added to the Speaker
+ * at runtime. In return, the Speaker then invokes it, and the operation
+ * represented by the functionality will be performed.
+ *
+ * For this, the Speaker accepts a functionality, asks it to visit it and
+ * perform the intended operation. Since, the new-behaviour visits the host,
+ * it is called a Visitor. And the pattern is called Visitor-Pattern.
+ *
+ * In visitor-pattern, at-first the visitor is accepted by the host, and secondly,
+ * the visitor is invoked by the host to visit it. Since the runtime-behaviour
+ * is achieved by two calls, this technique is also called Double-Dispatch.
+ *
+ * Created by Rishabh on 15-06-2020
+ */
+
+// implementation
+
 /**
  * Represents a Speaker.
  *
  * It accepts a [SpeakerStateVisitor] to allow addition of new-behaviour
  * at run-time. Behaviour may differ across various implementations
  * of [SpeakerStateVisitor].
- *
- * Created by Rishabh on 15-06-2020
  */
 class Speaker(private val name: String) {
 

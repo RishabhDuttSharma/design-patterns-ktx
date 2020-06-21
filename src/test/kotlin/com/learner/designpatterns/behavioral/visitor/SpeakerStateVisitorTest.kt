@@ -22,7 +22,7 @@ import org.junit.jupiter.api.Test
 
 /**
  * Test-Cases for [SpeakerStateVisitor] implementations
- * i.e.,
+ * i.e., [SpeakerPlayVisitor], [SpeakerPauseVisitor] & [SpeakerStopVisitor]
  *
  * Created by Rishabh on 20-06-2020
  */
