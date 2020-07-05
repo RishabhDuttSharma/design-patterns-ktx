@@ -29,8 +29,8 @@ interface WebApiClient<T> {
         val params = getParams()
 
 
-        onSuccess()
-        onError()
+//        onSuccess()
+//        onError()
     }
 
     fun getUrl(): String
