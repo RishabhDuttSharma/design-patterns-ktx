@@ -74,11 +74,11 @@ abstract class PaymentTemplate {
         }.let(::conclude)
     }
 
-    abstract fun authorize(): PaymentResult<AuthorizationToken>
+    protected abstract fun authorize(): PaymentResult<AuthorizationToken>
 
-    abstract fun payment(authToken: AuthorizationToken, amount: Double): PaymentResult<PaymentDetail>
+    protected abstract fun payment(authToken: AuthorizationToken, amount: Double): PaymentResult<PaymentDetail>
 
-    abstract fun conclude(result: String)
+    protected abstract fun conclude(result: String)
 }
 
 class CreditCardPaymentTemplate : PaymentTemplate() {
@@ -109,6 +109,31 @@ class CreditCardPaymentTemplate : PaymentTemplate() {
     }
 }
 
+class CashPaymentTemplate : PaymentTemplate() {
+
+    override fun authorize(): PaymentResult<AuthorizationToken> {
+        return PaymentResult.Success(AuthorizationToken("", 0), "authorized")
+    }
+
+    override fun payment(authToken: AuthorizationToken, amount: Double): PaymentResult<PaymentDetail> {
+        print("Payment Received (y/n): ")
+        val received = Scanner(System.`in`).nextLine().toString().startsWith("y", true)
+        if (received) {
+            val timeStamp = System.currentTimeMillis()
+            val transactionId = Base64.getEncoder().encodeToString(timeStamp.toString().toByteArray())
+            val paymentDetail = PaymentDetail(transactionId, timeStamp)
+            return PaymentResult.Success(paymentDetail, "Transaction successful.")
+        }
+        return PaymentResult.Error("Payment not received")
+    }
+
+    override fun conclude(result: String) {
+        println(result)
+    }
+
+}
+
 fun main() {
-    CreditCardPaymentTemplate().startPayment(3000.0)
+//    CreditCardPaymentTemplate().startPayment(3000.0)
+    CashPaymentTemplate().startPayment(3000.0)
 }
