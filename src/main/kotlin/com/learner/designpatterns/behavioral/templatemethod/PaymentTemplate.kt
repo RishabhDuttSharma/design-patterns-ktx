@@ -16,6 +16,7 @@
 
 package com.learner.designpatterns.behavioral.templatemethod
 
+import com.learner.designpatterns.Utils
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -130,10 +131,43 @@ class CashPaymentTemplate : PaymentTemplate() {
     override fun conclude(result: String) {
         println(result)
     }
+}
 
+class NetBankingPaymentTemplate : PaymentTemplate() {
+
+    override fun authorize(): PaymentResult<AuthorizationToken> {
+
+        val scanner = Scanner(System.`in`)
+
+        print("Username: ")
+        val username = scanner.nextLine().toString()
+        if (username.isEmpty()) {
+            return PaymentResult.Error("invalid username")
+        }
+
+        print("Password: ")
+        val password = scanner.nextLine().toString()
+        if (password.isEmpty()) {
+            return PaymentResult.Error("invalid password")
+        }
+
+        val authToken = AuthorizationToken(Utils.base64Encode("$username:$password"), 1_20_000)
+        return PaymentResult.Success(authToken, "authorized")
+    }
+
+    override fun payment(authToken: AuthorizationToken, amount: Double): PaymentResult<PaymentDetail> {
+        val timestamp = System.currentTimeMillis()
+        val paymentDetail = PaymentDetail(Utils.base64Encode(timestamp), timestamp)
+        return PaymentResult.Success(paymentDetail, "Transaction Successful.")
+    }
+
+    override fun conclude(result: String) {
+        println(result)
+    }
 }
 
 fun main() {
 //    CreditCardPaymentTemplate().startPayment(3000.0)
-    CashPaymentTemplate().startPayment(3000.0)
+//    CashPaymentTemplate().startPayment(3000.0)
+    NetBankingPaymentTemplate().startPayment(3000.0)
 }
