@@ -49,15 +49,12 @@ abstract class PaymentTemplate {
 
     fun startPayment(amount: Double) {
 
-        Thread.sleep(2000)
-
         val authResult = authorize()
         if (authResult is PaymentResult.Error) {
             return conclude(authResult)
         }
 
         val paymentResult = payment(authResult.data!!, amount)
-        Thread.sleep(2000)
         if (paymentResult is PaymentResult.Error) {
             return conclude(paymentResult)
         }
@@ -69,7 +66,7 @@ abstract class PaymentTemplate {
         paymentResult.data?.let {
             val transactionId = it.transactionId
             val formattedDate = it.timestamp.formatToDate("dd-MM-yyyy hh:mm:ss")
-            println("Transaction Detail\nId: $transactionId\nDate: $formattedDate")
+            println("Transaction Detail\nId: $transactionId\nDated: $formattedDate")
         }
     }
 
@@ -86,7 +83,7 @@ class CreditCardPaymentTemplate(private val cardNumber: String) : PaymentTemplat
         println("Enter PIN")
         val pin = Scanner(System.`in`).nextLine()
         if (pin.isNullOrEmpty()) {
-            return PaymentResult.Error("Incorrect PIN")
+            return PaymentResult.Error("Invalid PIN")
         }
         return WebApiServer.authorize(cardNumber, pin)
     }
@@ -148,9 +145,9 @@ class NetBankingPaymentTemplate : PaymentTemplate() {
 }
 
 fun main() {
-//    CreditCardPaymentTemplate().startPayment(3000.0)
-//    CashPaymentTemplate().startPayment(3000.0)
-    NetBankingPaymentTemplate().startPayment(3000.0)
+//    CreditCardPaymentTemplate("12345678").startPayment(3000.0)
+    CashPaymentTemplate().startPayment(3000.0)
+//    NetBankingPaymentTemplate().startPayment(3000.0)
 }
 
 object WebApiServer {
