@@ -182,7 +182,7 @@ object WebApiServer {
 
     fun doPayment(token: String, amount: Double): PaymentResult<TransactionDetail> {
         Thread.sleep(2000)
-        if (authTable.containsKey(token.base64Decode())) {
+        if (!authTable.containsKey(token.base64Decode())) {
             return PaymentResult.Error(MESSAGE_INVALID_TOKEN)
         }
         return PaymentResult.Success(createTransaction(amount), MESSAGE_TRANSACTION_SUCCESSFUL)
