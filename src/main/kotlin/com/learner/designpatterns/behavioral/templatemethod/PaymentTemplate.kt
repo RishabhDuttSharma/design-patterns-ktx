@@ -16,8 +16,9 @@
 
 package com.learner.designpatterns.behavioral.templatemethod
 
-import com.learner.designpatterns.Utils
-import java.text.SimpleDateFormat
+import com.learner.designpatterns.util.base64Decode
+import com.learner.designpatterns.util.base64Encode
+import com.learner.designpatterns.util.formatToDate
 import java.util.*
 
 /**
@@ -39,7 +40,7 @@ data class AuthorizationToken(
     val expires: Long
 )
 
-data class PaymentDetail(
+data class TransactionDetail(
     val transactionId: String,
     val timestamp: Long
 )
@@ -51,86 +52,71 @@ abstract class PaymentTemplate {
         Thread.sleep(2000)
 
         val authResult = authorize()
-        Thread.sleep(2000)
         if (authResult is PaymentResult.Error) {
-            conclude(authResult.message)
-            return
+            return conclude(authResult)
         }
 
         val paymentResult = payment(authResult.data!!, amount)
         Thread.sleep(2000)
         if (paymentResult is PaymentResult.Error) {
-            conclude(paymentResult.message)
-            return
+            return conclude(paymentResult)
         }
 
-        paymentResult.data!!.let {
-            val transactionId = paymentResult.data.transactionId
-            val dateTime = SimpleDateFormat("dd-MM-yyyy hh:mm:ss").format(
-                Calendar.getInstance().apply {
-                    timeInMillis = paymentResult.data.timestamp
-                }.time
-            )
-            String.format("Transaction successful\nId: $transactionId\nDate: $dateTime")
-        }.let(::conclude)
+        // show final payment result
+        conclude(paymentResult)
+
+        // print transaction-detail
+        paymentResult.data?.let {
+            val transactionId = it.transactionId
+            val formattedDate = it.timestamp.formatToDate("dd-MM-yyyy hh:mm:ss")
+            println("Transaction Detail\nId: $transactionId\nDate: $formattedDate")
+        }
     }
 
     protected abstract fun authorize(): PaymentResult<AuthorizationToken>
 
-    protected abstract fun payment(authToken: AuthorizationToken, amount: Double): PaymentResult<PaymentDetail>
+    protected abstract fun payment(authToken: AuthorizationToken, amount: Double): PaymentResult<TransactionDetail>
 
-    protected abstract fun conclude(result: String)
+    protected abstract fun conclude(result: PaymentResult<*>)
 }
 
-class CreditCardPaymentTemplate : PaymentTemplate() {
+class CreditCardPaymentTemplate(private val cardNumber: String) : PaymentTemplate() {
 
     override fun authorize(): PaymentResult<AuthorizationToken> {
-        val scanner = Scanner(System.`in`)
         println("Enter PIN")
-        val pin = scanner.nextLine()
-        if (pin.isNullOrEmpty())
+        val pin = Scanner(System.`in`).nextLine()
+        if (pin.isNullOrEmpty()) {
             return PaymentResult.Error("Incorrect PIN")
-
-        val authToken = Base64.getEncoder().encodeToString(pin.toByteArray())
-        return AuthorizationToken(authToken, 1_20_000).let {
-            PaymentResult.Success(it, "authorized")
         }
+        return WebApiServer.authorize(cardNumber, pin)
     }
 
-    override fun payment(authToken: AuthorizationToken, amount: Double): PaymentResult<PaymentDetail> {
-        println("Payment for INR $amount is in progress...")
-        val timeStamp = System.currentTimeMillis()
-        val transactionId = Base64.getEncoder().encodeToString(timeStamp.toString().toByteArray())
-        val paymentDetail = PaymentDetail(transactionId, timeStamp)
-        return PaymentResult.Success(paymentDetail, "Transaction successful.")
+    override fun payment(authToken: AuthorizationToken, amount: Double): PaymentResult<TransactionDetail> {
+        return WebApiServer.doPayment(authToken.token, amount)
     }
 
-    override fun conclude(result: String) {
-        println(result)
+    override fun conclude(result: PaymentResult<*>) = when (result) {
+        is PaymentResult.Success -> println("Payment successful for Credit Card $cardNumber")
+        else -> println("Payment Failed: ${result.message}")
     }
 }
 
 class CashPaymentTemplate : PaymentTemplate() {
 
-    override fun authorize(): PaymentResult<AuthorizationToken> {
-        return PaymentResult.Success(AuthorizationToken("", 0), "authorized")
-    }
+    override fun authorize() = WebApiServer.authorizeGuest()
 
-    override fun payment(authToken: AuthorizationToken, amount: Double): PaymentResult<PaymentDetail> {
+    override fun payment(authToken: AuthorizationToken, amount: Double): PaymentResult<TransactionDetail> {
         print("Payment Received (y/n): ")
-        val received = Scanner(System.`in`).nextLine().toString().startsWith("y", true)
-        if (received) {
-            val timeStamp = System.currentTimeMillis()
-            val transactionId = Base64.getEncoder().encodeToString(timeStamp.toString().toByteArray())
-            val paymentDetail = PaymentDetail(transactionId, timeStamp)
-            return PaymentResult.Success(paymentDetail, "Transaction successful.")
+        if (!Scanner(System.`in`).nextLine().toString().startsWith("y", true)) {
+            return PaymentResult.Error("Payment not received")
         }
-        return PaymentResult.Error("Payment not received")
+        return WebApiServer.doPayment(authToken.token, amount)
     }
 
-    override fun conclude(result: String) {
-        println(result)
-    }
+    override fun conclude(result: PaymentResult<*>) = when (result) {
+        is PaymentResult.Success -> "Success: ${result.message}"
+        else -> "Error: ${result.message}"
+    }.let(::println)
 }
 
 class NetBankingPaymentTemplate : PaymentTemplate() {
@@ -151,23 +137,67 @@ class NetBankingPaymentTemplate : PaymentTemplate() {
             return PaymentResult.Error("invalid password")
         }
 
-        val authToken = AuthorizationToken(Utils.base64Encode("$username:$password"), 1_20_000)
-        return PaymentResult.Success(authToken, "authorized")
+        return WebApiServer.authorize(username, password)
     }
 
-    override fun payment(authToken: AuthorizationToken, amount: Double): PaymentResult<PaymentDetail> {
-        val timestamp = System.currentTimeMillis()
-        val paymentDetail = PaymentDetail(Utils.base64Encode(timestamp), timestamp)
-        return PaymentResult.Success(paymentDetail, "Transaction Successful.")
+    override fun payment(authToken: AuthorizationToken, amount: Double): PaymentResult<TransactionDetail> {
+        return WebApiServer.doPayment(authToken.token, amount)
     }
 
-    override fun conclude(result: String) {
-        println(result)
-    }
+    override fun conclude(result: PaymentResult<*>) = println("NetBanking: ${result.message}")
 }
 
 fun main() {
 //    CreditCardPaymentTemplate().startPayment(3000.0)
 //    CashPaymentTemplate().startPayment(3000.0)
     NetBankingPaymentTemplate().startPayment(3000.0)
+}
+
+object WebApiServer {
+
+    private const val DEF_EXPIRES = 1_20_000L
+
+    private const val MESSAGE_AUTH_SUCCESS = "authorized"
+    private const val MESSAGE_INVALID_CREDENTIALS = "invalid credentials"
+    private const val MESSAGE_INVALID_TOKEN = "invalid token"
+    private const val MESSAGE_TRANSACTION_SUCCESSFUL = "transaction successful"
+
+    private val authTable = mutableMapOf(
+        "rishabh" to "sharma",
+        "12345678" to "0000",
+        "guest" to ""
+    )
+
+    private val transactionTable = mutableMapOf<String, Double>()
+
+    fun authorize(id: String, password: String): PaymentResult<AuthorizationToken> {
+        Thread.sleep(2000)
+        if (!validate(id, password)) {
+            return PaymentResult.Error(MESSAGE_INVALID_CREDENTIALS)
+        }
+        return PaymentResult.Success(createToken(id), MESSAGE_AUTH_SUCCESS)
+    }
+
+    fun authorizeGuest() = authorize("guest", "")
+
+    fun doPayment(token: String, amount: Double): PaymentResult<TransactionDetail> {
+        Thread.sleep(2000)
+        if (authTable.containsKey(token.base64Decode())) {
+            return PaymentResult.Error(MESSAGE_INVALID_TOKEN)
+        }
+        return PaymentResult.Success(createTransaction(amount), MESSAGE_TRANSACTION_SUCCESSFUL)
+    }
+
+    private fun validate(id: String, password: String) =
+        authTable.containsKey(id) && authTable[id] == password
+
+    private fun createToken(id: String): AuthorizationToken =
+        AuthorizationToken(id.base64Encode(), DEF_EXPIRES)
+
+    private fun createTransaction(amount: Double): TransactionDetail {
+        val timeMillis = System.currentTimeMillis()
+        val transactionId = timeMillis.base64Encode()
+        transactionTable[transactionId] = amount
+        return TransactionDetail(transactionId, timeMillis)
+    }
 }

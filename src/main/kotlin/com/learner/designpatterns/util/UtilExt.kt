@@ -14,18 +14,30 @@
  * limitations under the License.
  */
 
-package com.learner.designpatterns
+package com.learner.designpatterns.util
 
+import java.text.SimpleDateFormat
 import java.util.*
 
 /**
  *
  * Created by Rishabh on 06-07-2020
  */
-object Utils {
 
-    fun <T> base64Encode(input: T): String {
-        val target = input.toString().toByteArray()
-        return Base64.getEncoder().encodeToString(target)
-    }
+fun <T> T.base64Encode(): String {
+    val target = toString().toByteArray()
+    return Base64.getEncoder().encodeToString(target)
+}
+
+fun String.base64Decode(): String {
+    val decodedArr = Base64.getDecoder().decode(this)
+    return String(decodedArr)
+}
+
+fun Long.formatToDate(format: String): String {
+    return SimpleDateFormat(format).format(
+        Calendar.getInstance().also {
+            it.timeInMillis = this
+        }.time
+    )
 }
