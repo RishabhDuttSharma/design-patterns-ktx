@@ -30,6 +30,7 @@ sealed class PaymentResult<T>(
     val message: String,
     val data: T? = null
 ) {
+
     class Success<T>(data: T, message: String) : PaymentResult<T>(message, data)
 
     class Error<T>(message: String) : PaymentResult<T>(message)
@@ -48,6 +49,8 @@ data class TransactionDetail(
 abstract class PaymentTemplate {
 
     fun startPayment(amount: Double) {
+
+        init()
 
         val authResult = authorize()
         if (authResult is PaymentResult.Error) {
@@ -70,6 +73,8 @@ abstract class PaymentTemplate {
         }
     }
 
+    protected abstract fun init()
+
     protected abstract fun authorize(): PaymentResult<AuthorizationToken>
 
     protected abstract fun payment(authToken: AuthorizationToken, amount: Double): PaymentResult<TransactionDetail>
@@ -78,6 +83,8 @@ abstract class PaymentTemplate {
 }
 
 class CreditCardPaymentTemplate(private val cardNumber: String) : PaymentTemplate() {
+
+    override fun init() = println("Paying via Credit Card")
 
     override fun authorize(): PaymentResult<AuthorizationToken> {
         println("Enter PIN")
@@ -100,6 +107,8 @@ class CreditCardPaymentTemplate(private val cardNumber: String) : PaymentTemplat
 
 class CashPaymentTemplate : PaymentTemplate() {
 
+    override fun init() = println("Paying via Cash")
+
     override fun authorize() = WebApiServer.authorizeGuest()
 
     override fun payment(authToken: AuthorizationToken, amount: Double): PaymentResult<TransactionDetail> {
@@ -117,6 +126,8 @@ class CashPaymentTemplate : PaymentTemplate() {
 }
 
 class NetBankingPaymentTemplate : PaymentTemplate() {
+
+    override fun init() = println("Paying via Net-Banking")
 
     override fun authorize(): PaymentResult<AuthorizationToken> {
 
@@ -145,9 +156,11 @@ class NetBankingPaymentTemplate : PaymentTemplate() {
 }
 
 fun main() {
-//    CreditCardPaymentTemplate("12345678").startPayment(3000.0)
-    CashPaymentTemplate().startPayment(3000.0)
-//    NetBankingPaymentTemplate().startPayment(3000.0)
+    arrayOf(
+        CreditCardPaymentTemplate("12345678"),
+        CashPaymentTemplate(),
+        NetBankingPaymentTemplate()
+    ).random().startPayment(3000.0)
 }
 
 object WebApiServer {
