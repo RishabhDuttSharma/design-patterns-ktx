@@ -23,7 +23,7 @@ import java.util.*
  *
  * - User makes payment via Cash
  * - Agent confirms if cash is received
- * - WebServer is invoked for retrieving a guest-authorization-token
+ * - WebServer is invoked for retrieving the guest-authorization-token
  * - WebServer is invoked for creating respective transaction
  * - Transaction-detail is presented to end-user
  */

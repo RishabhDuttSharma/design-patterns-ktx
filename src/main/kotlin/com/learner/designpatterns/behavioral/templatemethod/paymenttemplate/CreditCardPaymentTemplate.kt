@@ -23,7 +23,7 @@ import java.util.*
  *
  * - Scan credit-card details via Card-Reading-Device
  * - Ask user to enter Credit-Card PIN
- * - WebServer is invoked for validating Card-Details and retrieving a authorization-token
+ * - WebServer is invoked for validating Card-Details and retrieving the authorization-token
  * - WebServer is invoked for making a transaction for given amount
  * - Transaction-detail is presented to end-user
  *
