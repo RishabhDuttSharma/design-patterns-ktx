@@ -14,27 +14,28 @@
  * limitations under the License.
  */
 
-package com.learner.designpatterns.behavioral.templatemethod
+package com.learner.designpatterns.behavioral.templatemethod.paymenttemplate
 
 /**
  *
- * Created by Rishabh on 26-06-2020
+ * Created by Rishabh on 09-07-2020
  */
+sealed class PaymentResult<T>(
+    val message: String,
+    val data: T? = null
+) {
 
-interface WebApiClient<T> {
+    class Success<T>(data: T, message: String) : PaymentResult<T>(message, data)
 
-    fun makeCall() {
-
-        val url = getUrl()
-        val params = getParams()
-
-
-//        onSuccess()
-//        onError()
-    }
-
-    fun getUrl(): String
-    fun getParams(): Map<String, String>
-    fun onSuccess(response: T)
-    fun onError(error: Exception)
+    class Error<T>(message: String) : PaymentResult<T>(message)
 }
+
+data class AuthorizationToken(
+    val token: String,
+    val expires: Long
+)
+
+data class TransactionDetail(
+    val transactionId: String,
+    val timestamp: Long
+)
