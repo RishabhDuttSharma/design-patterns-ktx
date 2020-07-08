@@ -23,8 +23,8 @@ import java.util.*
  *
  * - User makes payment via Cash
  * - Agent confirms if cash is received
- * - WebServer is invoked for creating respective transaction if payment is received,
- * else throws error
+ * - WebServer is invoked for retrieving a guest-authorization-token
+ * - WebServer is invoked for creating respective transaction
  * - Transaction-detail is presented to end-user
  */
 class CashPaymentTemplate : PaymentTemplate() {
@@ -48,7 +48,7 @@ class CashPaymentTemplate : PaymentTemplate() {
         return WebApiServer.doTransaction(authToken.token, amount)
     }
 
-    /** Show results */
+    /** show results */
     override fun conclude(result: PaymentResult<*>) = when (result) {
         is PaymentResult.Success -> "Success: ${result.message}"
         else -> "Error: ${result.message}"
