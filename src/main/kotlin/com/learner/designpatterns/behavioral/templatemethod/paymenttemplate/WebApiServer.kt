@@ -19,6 +19,9 @@ package com.learner.designpatterns.behavioral.templatemethod.paymenttemplate
 import com.learner.designpatterns.util.base64Decode
 import com.learner.designpatterns.util.base64Encode
 
+/**
+ * Represents a Mock Web-Server that executes a request and then return a response
+ */
 object WebApiServer {
 
     private const val DEF_EXPIRES = 1_20_000L
@@ -36,60 +39,32 @@ object WebApiServer {
 
     private val transactionTable = mutableMapOf<String, Double>()
 
-    fun authorize(id: String, password: String): PaymentResult<AuthorizationToken> {
-        if (!validate(
-                id,
-                password
-            )
-        ) {
-            return PaymentResult.Error(
-                MESSAGE_INVALID_CREDENTIALS
-            )
+    fun authorize(id: String, password: String): PaymentResult<AuthorizationToken> =
+        if (!validate(id, password)) {
+            PaymentResult.Error(MESSAGE_INVALID_CREDENTIALS)
+        } else {
+            PaymentResult.Success(createToken(id), MESSAGE_AUTH_SUCCESS)
         }
-        return PaymentResult.Success(
-            createToken(
-                id
-            ),
-            MESSAGE_AUTH_SUCCESS
-        )
-    }
 
-    fun authorizeGuest() =
-        authorize(
-            "guest",
-            ""
-        )
+    fun authorizeGuest() = authorize("guest", "")
 
-    fun doTransaction(token: String, amount: Double): PaymentResult<TransactionDetail> {
+    fun doTransaction(token: String, amount: Double): PaymentResult<TransactionDetail> =
         if (!authTable.containsKey(token.base64Decode())) {
-            return PaymentResult.Error(
-                MESSAGE_INVALID_TOKEN
-            )
+            PaymentResult.Error(MESSAGE_INVALID_TOKEN)
+        } else {
+            PaymentResult.Success(createTransaction(amount), MESSAGE_TRANSACTION_SUCCESSFUL)
         }
-        return PaymentResult.Success(
-            createTransaction(
-                amount
-            ),
-            MESSAGE_TRANSACTION_SUCCESSFUL
-        )
-    }
 
     private fun validate(id: String, password: String) =
         authTable.containsKey(id) && authTable[id] == password
 
     private fun createToken(id: String): AuthorizationToken =
-        AuthorizationToken(
-            id.base64Encode(),
-            DEF_EXPIRES
-        )
+        AuthorizationToken(id.base64Encode(), DEF_EXPIRES)
 
     private fun createTransaction(amount: Double): TransactionDetail {
         val timeMillis = System.currentTimeMillis()
         val transactionId = timeMillis.base64Encode()
         transactionTable[transactionId] = amount
-        return TransactionDetail(
-            transactionId,
-            timeMillis
-        )
+        return TransactionDetail(transactionId, timeMillis)
     }
 }

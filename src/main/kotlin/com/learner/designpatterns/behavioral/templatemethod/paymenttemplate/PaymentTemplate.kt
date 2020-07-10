@@ -19,12 +19,29 @@ package com.learner.designpatterns.behavioral.templatemethod.paymenttemplate
 import com.learner.designpatterns.util.formatToDate
 
 /**
+ * Payment Template
+ * ----------------
+ *
+ * A retail invoicing-system may support various payment-systems. It reduces
+ * the chances of a customer-conflict during payment.
+ *
+ * For making a payment, there are certain steps that are followed till its
+ * completion e.g., initializing pre-requisites for further steps, taking
+ * authorization(on-behalf of Customer) for making payment, registering the
+ * payment at a centralized-database and then printing the transaction detail
+ * for the same.
+ *
+ * To be able to invoke several types of payment-systems through these steps,
+ * a [PaymentTemplate] can be defined. The [PaymentTemplate] defines all the
+ * necessary steps as abstract methods. Along with these abstracts methods,
+ * it defines another method([beginTransaction]) with definition that calls
+ * all the other methods in the required order.
  *
  * Created by Rishabh on 01-07-2020
  */
 abstract class PaymentTemplate {
 
-    fun startPayment(amount: Double) {
+    fun beginTransaction(amount: Double) {
 
         // => 1. perform initialization
         initialize()
@@ -78,19 +95,19 @@ abstract class PaymentTemplate {
     protected abstract fun transact(authToken: AuthorizationToken, amount: Double): PaymentResult<TransactionDetail>
 
     /**
-     * Step 4: Conclude
+     * Intermediary Step: Conclude
      *
-     * Shows results to user after completion of each step.
-     * In case of errors, intermediate steps would automatically be skipped.
+     * Shows result of processing after completion of each step.
      */
     protected abstract fun conclude(result: PaymentResult<*>)
 }
 
+/** playground */
 fun main() {
     arrayOf(
         CreditCardPaymentTemplate { "12345678" },
         CashPaymentTemplate(),
         NetBankingPaymentTemplate()
-    ).random().startPayment(3000.0)
+    ).random().beginTransaction(3000.0)
 }
 

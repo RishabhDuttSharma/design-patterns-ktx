@@ -17,6 +17,10 @@
 package com.learner.designpatterns.behavioral.templatemethod.paymenttemplate
 
 /**
+ * Model class to hold Payment Result
+ *
+ * @param message the message of the result
+ * @param data the result of the process
  *
  * Created by Rishabh on 09-07-2020
  */
@@ -25,16 +29,31 @@ sealed class PaymentResult<T>(
     val data: T? = null
 ) {
 
+    /** Represents the Success form of PaymentResult */
     class Success<T>(data: T, message: String) : PaymentResult<T>(message, data)
 
+    /** Represents the Error form of PaymentResult */
     class Error<T>(message: String) : PaymentResult<T>(message)
 }
 
+/**
+ * Model class to hold the authorization-token to be used
+ * for Payment-requests on-behalf of the User
+ *
+ * @param token the authorization-token
+ * @param expires the life of authorization-token in millis
+ */
 data class AuthorizationToken(
     val token: String,
     val expires: Long
 )
 
+/**
+ * Model class to hold the Transaction-detail of the payment
+ *
+ * @param transactionId the unique-id for a given payment
+ * @param timestamp the time at which the transaction is committed
+ */
 data class TransactionDetail(
     val transactionId: String,
     val timestamp: Long
