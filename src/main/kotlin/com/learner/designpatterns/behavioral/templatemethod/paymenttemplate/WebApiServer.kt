@@ -27,9 +27,9 @@ object WebApiServer {
     private const val DEF_EXPIRES = 1_20_000L
 
     private const val MESSAGE_AUTH_SUCCESS = "authorized"
-    private const val MESSAGE_INVALID_CREDENTIALS = "invalid credentials"
-    private const val MESSAGE_INVALID_TOKEN = "invalid token"
-    private const val MESSAGE_TRANSACTION_SUCCESSFUL = "transaction successful"
+    private const val MESSAGE_INVALID_CREDENTIALS = "Invalid credentials"
+    private const val MESSAGE_INVALID_TOKEN = "Invalid token"
+    private const val MESSAGE_TRANSACTION_SUCCESSFUL = "Transaction successful"
 
     private val authTable = mutableMapOf(
         "rishabh" to "sharma",

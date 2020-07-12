@@ -49,8 +49,5 @@ class CashPaymentTemplate : PaymentTemplate() {
     }
 
     /** show results */
-    override fun conclude(result: PaymentResult<*>) = when (result) {
-        is PaymentResult.Success -> "Success: ${result.message}"
-        else -> "Error: ${result.message}"
-    }.let(::println)
+    override fun conclude() = println("Thank you!")
 }

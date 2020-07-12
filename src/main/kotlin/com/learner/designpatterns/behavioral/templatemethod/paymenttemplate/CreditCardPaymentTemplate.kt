@@ -35,15 +35,16 @@ class CreditCardPaymentTemplate(private val creditCardReader: () -> String) : Pa
 
     /** initial set-up -> read card-number */
     override fun initialize() {
-        println("Paying via Credit Card")
         // read credit-card number from reader-device
         cardNumber = creditCardReader()
+        // show information text
+        println("Paying via Credit Card ***${cardNumber.takeLast(3)}")
     }
 
     /** perform authorization */
     override fun authorize(): PaymentResult<AuthorizationToken> {
         // ask user to enter PIN
-        println("Enter PIN")
+        print("Enter PIN: ")
         val pin = Scanner(System.`in`).nextLine()
         // validate if a valid PIN is entered
         if (pin.isNullOrEmpty()) {
@@ -58,8 +59,5 @@ class CreditCardPaymentTemplate(private val creditCardReader: () -> String) : Pa
         WebApiServer.doTransaction(authToken.token, amount)
 
     /** show results */
-    override fun conclude(result: PaymentResult<*>) = when (result) {
-        is PaymentResult.Success -> println("Payment successful for Card ***${cardNumber.takeLast(3)}")
-        else -> println("Payment Failed: ${result.message}")
-    }
+    override fun conclude() = println("Safe to remove Credit Card")
 }

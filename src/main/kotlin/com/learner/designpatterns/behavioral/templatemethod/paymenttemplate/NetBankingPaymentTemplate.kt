@@ -60,5 +60,5 @@ class NetBankingPaymentTemplate : PaymentTemplate() {
         WebApiServer.doTransaction(authToken.token, amount)
 
     /** Show results */
-    override fun conclude(result: PaymentResult<*>) = println("NetBanking: ${result.message}")
+    override fun conclude() = println("Please close the session.")
 }

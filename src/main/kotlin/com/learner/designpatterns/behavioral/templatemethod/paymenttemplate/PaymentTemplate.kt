@@ -34,41 +34,34 @@ import com.learner.designpatterns.util.formatToDate
  * To be able to invoke several types of payment-systems through these steps,
  * a [PaymentTemplate] can be defined. The [PaymentTemplate] defines all the
  * necessary steps as abstract methods. Along with these abstracts methods,
- * it defines another method([beginTransaction]) with definition that calls
+ * it defines another method([doTransaction]) with definition that calls
  * all the other methods in the required order.
  *
  * Created by Rishabh on 01-07-2020
  */
 abstract class PaymentTemplate {
 
-    fun beginTransaction(amount: Double) {
+    @Throws(PaymentException::class)
+    fun doTransaction(amount: Double): TransactionDetail {
 
         // => 1. perform initialization
         initialize()
 
         // => 2. perform authorization
-        val authResult = authorize()
-        // show authorization result
-        conclude(authResult)
-        // return if authorization is failed
-        if (authResult is PaymentResult.Error) return
-
-        // data in result would be non-null for Success
-        val authToken = authResult.data!!
+        val authToken = authorize()
+            // throw exception if authorization is failed
+            .getResultOrThrowException()
 
         // => 3. perform transaction
-        val paymentResult = transact(authToken, amount)
-        // show payment-result irrespective its status
-        conclude(paymentResult)
-        // return if payment is failed
-        if (paymentResult is PaymentResult.Error) return
+        val transactionDetail = transact(authToken, amount)
+            // throw exception if payment is failed
+            .getResultOrThrowException()
 
-        // print transaction-detail
-        paymentResult.data!!.let {
-            val transactionId = it.transactionId
-            val formattedDate = it.timestamp.formatToDate("dd-MM-yyyy hh:mm:ss")
-            println("Transaction Detail\nId: $transactionId\nDated: $formattedDate")
-        }
+        // => 4. conclude
+        conclude()
+
+        // return transaction-detail
+        return transactionDetail
     }
 
     /**
@@ -95,19 +88,36 @@ abstract class PaymentTemplate {
     protected abstract fun transact(authToken: AuthorizationToken, amount: Double): PaymentResult<TransactionDetail>
 
     /**
-     * Intermediary Step: Conclude
+     * Step 4: Conclude
      *
-     * Shows result of processing after completion of each step.
+     * Release any resources held during transaction, or show important information
+     * corresponding the transaction
      */
-    protected abstract fun conclude(result: PaymentResult<*>)
+    protected abstract fun conclude()
+
+
+    private fun <T> PaymentResult<T>.getResultOrThrowException(): T =
+        if (this is PaymentResult.Error) throw PaymentException(message) else data!!
+
+    class PaymentException(message: String) : Exception(message)
 }
 
 /** playground */
 fun main() {
-    arrayOf(
-        CreditCardPaymentTemplate { "12345678" },
-        CashPaymentTemplate(),
-        NetBankingPaymentTemplate()
-    ).random().beginTransaction(3000.0)
-}
 
+    try {
+        arrayOf(
+            CreditCardPaymentTemplate { "12345678" },
+            CashPaymentTemplate(),
+            NetBankingPaymentTemplate()
+        ).random()
+            .doTransaction(3000.0).let {
+                // print transaction-detail
+                val transactionId = it.transactionId
+                val formattedDate = it.timestamp.formatToDate("dd-MM-yyyy hh:mm:ss")
+                println("Transaction Detail\nId: $transactionId\nDated: $formattedDate")
+            }
+    } catch (e: PaymentTemplate.PaymentException) {
+        println("Payment Failed: ${e.message}")
+    }
+}
