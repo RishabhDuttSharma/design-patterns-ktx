@@ -17,6 +17,7 @@
 package com.learner.designpatterns.behavioral.templatemethod.paymenttemplate
 
 import com.learner.designpatterns.util.formatToDate
+import java.util.*
 
 /**
  * Payment Template
@@ -106,10 +107,16 @@ abstract class PaymentTemplate {
 fun main() {
 
     try {
+
+        val inputMethodHandler: (InputMethod) -> String = {
+            print("${it.requestMessage}: ")
+            Scanner(System.`in`).nextLine().toString()
+        }
+
         arrayOf(
-            CreditCardPaymentTemplate { "12345678" },
-            CashPaymentTemplate(),
-            NetBankingPaymentTemplate()
+            CreditCardPaymentTemplate(inputMethodHandler),
+            CashPaymentTemplate(inputMethodHandler),
+            NetBankingPaymentTemplate(inputMethodHandler)
         ).random()
             .doTransaction(3000.0).let {
                 // print transaction-detail

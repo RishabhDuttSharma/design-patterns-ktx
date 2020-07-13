@@ -16,8 +16,6 @@
 
 package com.learner.designpatterns.behavioral.templatemethod.paymenttemplate
 
-import java.util.*
-
 /**
  * [PaymentTemplate] implementation for making payment via Cash
  *
@@ -27,7 +25,7 @@ import java.util.*
  * - WebServer is invoked for creating respective transaction
  * - Transaction-detail is presented to end-user
  */
-class CashPaymentTemplate : PaymentTemplate() {
+class CashPaymentTemplate(private val confirmationProvider: (InputMethod) -> String) : PaymentTemplate() {
 
     /** initial set-up */
     override fun initialize() = println("Paying via Cash")
@@ -38,8 +36,7 @@ class CashPaymentTemplate : PaymentTemplate() {
     /** perform transaction */
     override fun transact(authToken: AuthorizationToken, amount: Double): PaymentResult<TransactionDetail> {
         // payment initiated. ask if payment-amount is received
-        print("Payment Received (y/n): ")
-        val agentInput = Scanner(System.`in`).nextLine().toString()
+        val agentInput = confirmationProvider(InputMethod.CONFIRM_PAYMENT_RECEIVED)
         // return payment-error if payment is denied
         if (!agentInput.startsWith("y", true)) {
             return PaymentResult.Error("Payment not received")
@@ -48,6 +45,6 @@ class CashPaymentTemplate : PaymentTemplate() {
         return WebApiServer.doTransaction(authToken.token, amount)
     }
 
-    /** show results */
+    /** show information on result */
     override fun conclude() = println("Thank you!")
 }

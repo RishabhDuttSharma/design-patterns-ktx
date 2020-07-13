@@ -16,8 +16,6 @@
 
 package com.learner.designpatterns.behavioral.templatemethod.paymenttemplate
 
-import java.util.*
-
 /**
  * [PaymentTemplate] for implementing payment via Credit-Card using a Credit-Card Reader
  *
@@ -29,14 +27,14 @@ import java.util.*
  *
  * @param creditCardReader device that reads credit-card and returns its number
  */
-class CreditCardPaymentTemplate(private val creditCardReader: () -> String) : PaymentTemplate() {
+class CreditCardPaymentTemplate(private val creditCardReader: (InputMethod) -> String) : PaymentTemplate() {
 
     private lateinit var cardNumber: String
 
     /** initial set-up -> read card-number */
     override fun initialize() {
         // read credit-card number from reader-device
-        cardNumber = creditCardReader()
+        cardNumber = creditCardReader(InputMethod.CREDIT_CARD_NUMBER)
         // show information text
         println("Paying via Credit Card ***${cardNumber.takeLast(3)}")
     }
@@ -44,10 +42,9 @@ class CreditCardPaymentTemplate(private val creditCardReader: () -> String) : Pa
     /** perform authorization */
     override fun authorize(): PaymentResult<AuthorizationToken> {
         // ask user to enter PIN
-        print("Enter PIN: ")
-        val pin = Scanner(System.`in`).nextLine()
+        val pin = creditCardReader(InputMethod.CREDIT_CARD_PIN)
         // validate if a valid PIN is entered
-        if (pin.isNullOrEmpty()) {
+        if (pin.isEmpty()) {
             return PaymentResult.Error("Invalid PIN")
         }
         // asks server to validate, and return authorization-token
@@ -58,6 +55,6 @@ class CreditCardPaymentTemplate(private val creditCardReader: () -> String) : Pa
     override fun transact(authToken: AuthorizationToken, amount: Double) =
         WebApiServer.doTransaction(authToken.token, amount)
 
-    /** show results */
+    /** show information on result */
     override fun conclude() = println("Safe to remove Credit Card")
 }

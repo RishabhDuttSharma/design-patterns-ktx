@@ -16,37 +16,30 @@
 
 package com.learner.designpatterns.behavioral.templatemethod.paymenttemplate
 
-import java.util.*
-
 /**
  * [PaymentTemplate] for implementing payment via Net-Banking
  *
  * - Asks end-user to enter Username and Password
  * - Invoke WebServer to validate and retrieve the authorization-token
  * - Invoke WebServer to perform transaction for given amount
- * - Show transaction details to the end-user
+ * - Inform the User to close the Session
  */
-class NetBankingPaymentTemplate : PaymentTemplate() {
+class NetBankingPaymentTemplate(private val inputMethodHandler: (InputMethod) -> String) : PaymentTemplate() {
 
     /** initial set-up */
     override fun initialize() = println("Paying via Net-Banking")
 
     /** perform authorization */
     override fun authorize(): PaymentResult<AuthorizationToken> {
-
-        val scanner = Scanner(System.`in`)
-
-        print("Username: ")
         // ask user to enter username
-        val username = scanner.nextLine().toString()
+        val username = inputMethodHandler(InputMethod.USERNAME)
         // check username and return error, if invalid
         if (username.isEmpty()) {
-            return PaymentResult.Error("invalid username")
+            return PaymentResult.Error("Invalid username")
         }
 
-        print("Password: ")
         // ask user to enter password
-        val password = scanner.nextLine().toString()
+        val password = inputMethodHandler(InputMethod.PASSWORD)
         // check password and return error, if invalid
         if (password.isEmpty()) {
             return PaymentResult.Error("invalid password")
@@ -59,6 +52,6 @@ class NetBankingPaymentTemplate : PaymentTemplate() {
     override fun transact(authToken: AuthorizationToken, amount: Double) =
         WebApiServer.doTransaction(authToken.token, amount)
 
-    /** Show results */
+    /** show information on result */
     override fun conclude() = println("Please close the session.")
 }
