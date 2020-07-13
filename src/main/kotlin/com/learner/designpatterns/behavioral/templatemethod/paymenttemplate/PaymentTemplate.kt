@@ -20,7 +20,7 @@ import com.learner.designpatterns.util.formatToDate
 import java.util.*
 
 /**
- * Payment Template
+ * Payment-Template
  * ----------------
  *
  * A retail invoicing-system may support various payment-systems. It reduces
@@ -42,6 +42,13 @@ import java.util.*
  */
 abstract class PaymentTemplate {
 
+    /**
+     * Template-method that executes other steps of the transaction in-order
+     *
+     * @param amount the payment applicable
+     * @throws PaymentException if payment is not successful
+     * @return the [TransactionDetail] if payment is successful, throws [Exception] otherwise
+     */
     @Throws(PaymentException::class)
     fun doTransaction(amount: Double): TransactionDetail {
 
@@ -97,27 +104,33 @@ abstract class PaymentTemplate {
     protected abstract fun conclude()
 
 
+    /** Thrown when an error is occurred during payment */
+    class PaymentException(message: String) : Exception(message)
+
+    /**
+     * Returns the result in [PaymentResult.data], if [PaymentResult.Success],
+     * throws [Exception] otherwise
+     */
     private fun <T> PaymentResult<T>.getResultOrThrowException(): T =
         if (this is PaymentResult.Error) throw PaymentException(message) else data!!
-
-    class PaymentException(message: String) : Exception(message)
 }
 
 /** playground */
 fun main() {
 
+    // use system-console as input-handler
+    val inputMethodHandler: (InputMethod) -> String = {
+        print("${it.requestMessage}: ")
+        Scanner(System.`in`).nextLine().toString()
+    }
+
     try {
-
-        val inputMethodHandler: (InputMethod) -> String = {
-            print("${it.requestMessage}: ")
-            Scanner(System.`in`).nextLine().toString()
-        }
-
+        // creates an array of available payment-systems
         arrayOf(
             CreditCardPaymentTemplate(inputMethodHandler),
             CashPaymentTemplate(inputMethodHandler),
             NetBankingPaymentTemplate(inputMethodHandler)
-        ).random()
+        ).random()  // select a random payment-system, and invoke transaction
             .doTransaction(3000.0).let {
                 // print transaction-detail
                 val transactionId = it.transactionId
@@ -125,6 +138,7 @@ fun main() {
                 println("Transaction Detail\nId: $transactionId\nDated: $formattedDate")
             }
     } catch (e: PaymentTemplate.PaymentException) {
+        // show with message that the payment is failed
         println("Payment Failed: ${e.message}")
     }
 }
