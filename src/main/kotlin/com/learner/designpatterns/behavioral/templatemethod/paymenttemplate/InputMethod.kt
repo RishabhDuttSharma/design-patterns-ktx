@@ -17,6 +17,8 @@
 package com.learner.designpatterns.behavioral.templatemethod.paymenttemplate
 
 /**
+ * Wraps various messages and their corresponding request codes for
+ * detailing the user about the required input.
  *
  * Created by Rishabh on 13-07-2020
  */
