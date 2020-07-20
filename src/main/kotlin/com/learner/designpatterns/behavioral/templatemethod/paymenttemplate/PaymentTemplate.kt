@@ -23,7 +23,7 @@ import java.util.*
  * Payment-Template
  * ----------------
  *
- * A retail invoicing-system may support various payment-systems. It reduces
+ * A retail invoicing-system may support various payment-methods. It reduces
  * the chances of a customer-conflict during payment.
  *
  * For making a payment, there are certain steps that are followed till its
@@ -32,7 +32,7 @@ import java.util.*
  * payment at a centralized-database and then printing the transaction detail
  * for the same.
  *
- * To be able to invoke several types of payment-systems through these steps,
+ * To be able to invoke several types of payment-methods through these steps,
  * a [PaymentTemplate] can be defined. The [PaymentTemplate] defines all the
  * necessary steps as abstract methods. Along with these abstracts methods,
  * it defines another method([doTransaction]) with definition that calls
@@ -82,8 +82,11 @@ abstract class PaymentTemplate {
     /**
      * Step 2: Authorize
      *
-     * Sends user-information to a WebServer to receive a authorization-token
+     * Sends user-information to the WebServer to receive a authorization-token
      * for making further payment related requests.
+     *
+     * @return [PaymentResult.Success] with [AuthorizationToken] on success,
+     * [PaymentResult.Error] otherwise
      */
     protected abstract fun authorize(): PaymentResult<AuthorizationToken>
 
@@ -92,6 +95,12 @@ abstract class PaymentTemplate {
      *
      * Sends authorization-token along with amount to WebApiServer for invoking
      * payment-transaction
+     *
+     * @param authToken the token received during [authorize]
+     * @param amount the amount for transaction
+     *
+     * @return [PaymentResult.Success] with [TransactionDetail] on success,
+     * [PaymentResult.Error] otherwise
      */
     protected abstract fun transact(authToken: AuthorizationToken, amount: Double): PaymentResult<TransactionDetail>
 
@@ -104,7 +113,7 @@ abstract class PaymentTemplate {
     protected abstract fun conclude()
 
 
-    /** Thrown when an error is occurred during payment */
+    /** Thrown when an error is occurred during payment-process */
     class PaymentException(message: String) : Exception(message)
 
     /**

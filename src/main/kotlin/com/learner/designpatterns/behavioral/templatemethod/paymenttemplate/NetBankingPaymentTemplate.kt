@@ -42,7 +42,7 @@ class NetBankingPaymentTemplate(private val inputMethodHandler: (InputMethod) ->
         val password = inputMethodHandler(InputMethod.PASSWORD)
         // check password and return error, if invalid
         if (password.isEmpty()) {
-            return PaymentResult.Error("invalid password")
+            return PaymentResult.Error("Invalid password")
         }
         // ask web-server to validate user credentials, and return auth-token
         return WebApiServer.authorize(username, password)

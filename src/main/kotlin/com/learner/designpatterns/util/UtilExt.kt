@@ -20,24 +20,20 @@ import java.text.SimpleDateFormat
 import java.util.*
 
 /**
- *
- * Created by Rishabh on 06-07-2020
+ * Returns the Base64-encoded value
  */
+fun String.base64Encode(): String =
+    Base64.getEncoder().encodeToString(toByteArray())
 
-fun <T> T.base64Encode(): String {
-    val target = toString().toByteArray()
-    return Base64.getEncoder().encodeToString(target)
-}
+/**
+ * Returns the Base64-decoded value
+ */
+fun String.base64Decode(): String =
+    String(Base64.getDecoder().decode(this))
 
-fun String.base64Decode(): String {
-    val decodedArr = Base64.getDecoder().decode(this)
-    return String(decodedArr)
-}
-
-fun Long.formatToDate(format: String): String {
-    return SimpleDateFormat(format).format(
-        Calendar.getInstance().also {
-            it.timeInMillis = this
-        }.time
-    )
-}
+/**
+ * Returns the formatted-date
+ */
+fun Long.formatToDate(dateFormat: String): String = Calendar.getInstance()
+    .also { it.timeInMillis = this }.time
+    .let(SimpleDateFormat(dateFormat)::format)

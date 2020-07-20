@@ -24,7 +24,7 @@ import com.learner.designpatterns.util.base64Encode
  */
 object WebApiServer {
 
-    private const val DEF_EXPIRES = 1_20_000L
+    private const val AUTH_TOKEN_EXPIRES = 1_20_000L
 
     // web-server message properties
     private const val MESSAGE_AUTH_SUCCESS = "authorized"
@@ -89,14 +89,14 @@ object WebApiServer {
      * Generates a [AuthorizationToken] for given [id]
      */
     private fun createToken(id: String): AuthorizationToken =
-        AuthorizationToken(id.base64Encode(), DEF_EXPIRES)
+        AuthorizationToken(id.base64Encode(), AUTH_TOKEN_EXPIRES)
 
     /**
      * Creates [TransactionDetail] for given payment [amount]
      */
     private fun createTransaction(amount: Double): TransactionDetail {
         val timeMillis = System.currentTimeMillis()
-        val transactionId = timeMillis.base64Encode()
+        val transactionId = timeMillis.toString().base64Encode()
         transactionTable[transactionId] = amount
         return TransactionDetail(transactionId, timeMillis)
     }
