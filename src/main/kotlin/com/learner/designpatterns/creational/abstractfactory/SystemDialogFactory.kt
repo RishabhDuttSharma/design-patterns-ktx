@@ -67,7 +67,7 @@ abstract class SystemDialog(private val dialogConfig: DialogConfig) {
     fun show() {
         println("=== ${dialogConfig.systemType} ===")
         showContents()
-        println("=== ENDs ===")
+        println("=== ENDS ===")
     }
 }
 
@@ -126,11 +126,15 @@ interface SystemDialogFactory {
 
     /**
      * Creates instance of [SimpleDialog] for a given system-implementation
+     *
+     * {factory-method: information-dialog}
      */
     fun createDialog(message: String): SimpleDialog
 
     /**
      * Creates instance of [ActionDialog] for a given system-implementation
+     *
+     * {factory-method: action-dialog}
      */
     fun createActionDialog(message: String, action: String): ActionDialog
 }

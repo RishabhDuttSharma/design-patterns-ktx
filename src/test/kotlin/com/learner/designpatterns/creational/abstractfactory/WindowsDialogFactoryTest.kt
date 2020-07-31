@@ -33,7 +33,7 @@ internal class WindowsDialogFactoryTest {
     }
 
     @Test
-    fun `verify createActionDialog() return ActionDialog`() {
+    fun `verify createActionDialog() returns ActionDialog`() {
         val dialog = WindowsDialogFactory().createActionDialog("test-message", "test-action")
         Assertions.assertThat(dialog).isExactlyInstanceOf(ActionDialog::class.java)
     }
