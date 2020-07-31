@@ -182,8 +182,18 @@ class MacOsDialogFactory : SystemDialogFactory {
 /* playground */
 fun main() {
 
-    listOf<(SystemDialogFactory) -> SystemDialog>(
-        { it.createActionDialog("This is a sample message", "Ok") },
-        { it.createDialog("This is a sample message") }
-    ).random()(arrayOf(MacOsDialogFactory(), WindowsDialogFactory()).random()).show()
+    // select a dialog-factory, randomly
+    val systemDialogFactory = arrayOf(
+        MacOsDialogFactory(),
+        WindowsDialogFactory()
+    ).random()
+
+    // select a dialog-factory-method, randomly
+    val systemDialogAction = listOf<(SystemDialogFactory) -> SystemDialog>(
+        { it.createDialog("This is a sample message") },
+        { it.createActionDialog("This is a sample message", "Ok") }
+    ).random()
+
+    // invoke dialog-action on dialog-factory, and then show-dialog
+    systemDialogAction(systemDialogFactory).show()
 }
